@@ -1,0 +1,16 @@
+C:\Users\www\Documents\Вузик\GameWinForm\bin\Debug\net8.0-windows\GameWinForm.exe
+C:\Users\www\Documents\Вузик\GameWinForm\bin\Debug\net8.0-windows\GameWinForm.deps.json
+C:\Users\www\Documents\Вузик\GameWinForm\bin\Debug\net8.0-windows\GameWinForm.runtimeconfig.json
+C:\Users\www\Documents\Вузик\GameWinForm\bin\Debug\net8.0-windows\GameWinForm.dll
+C:\Users\www\Documents\Вузик\GameWinForm\bin\Debug\net8.0-windows\GameWinForm.pdb
+C:\Users\www\Documents\Вузик\GameWinForm\obj\Debug\net8.0-windows\GameWinForm.csproj.GenerateResource.cache
+C:\Users\www\Documents\Вузик\GameWinForm\obj\Debug\net8.0-windows\GameWinForm.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\www\Documents\Вузик\GameWinForm\obj\Debug\net8.0-windows\GameWinForm.AssemblyInfoInputs.cache
+C:\Users\www\Documents\Вузик\GameWinForm\obj\Debug\net8.0-windows\GameWinForm.AssemblyInfo.cs
+C:\Users\www\Documents\Вузик\GameWinForm\obj\Debug\net8.0-windows\GameWinForm.csproj.CoreCompileInputs.cache
+C:\Users\www\Documents\Вузик\GameWinForm\obj\Debug\net8.0-windows\GameWinForm.dll
+C:\Users\www\Documents\Вузик\GameWinForm\obj\Debug\net8.0-windows\refint\GameWinForm.dll
+C:\Users\www\Documents\Вузик\GameWinForm\obj\Debug\net8.0-windows\GameWinForm.pdb
+C:\Users\www\Documents\Вузик\GameWinForm\obj\Debug\net8.0-windows\GameWinForm.genruntimeconfig.cache
+C:\Users\www\Documents\Вузик\GameWinForm\obj\Debug\net8.0-windows\ref\GameWinForm.dll
+C:\Users\www\Documents\Вузик\GameWinForm\obj\Debug\net8.0-windows\GameWinForm.View.MainForm.resources
