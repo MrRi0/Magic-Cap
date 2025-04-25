@@ -19,8 +19,10 @@ namespace GameWinForm.View
         public GameRender(GameModel model)
         {
             _model = model;
-            _playerSprite = new Bitmap(@"C:\Users\www\Documents\Вузик\GameWinForm\View\player2.png");
-            _missileSprite = new Bitmap(@"C:\Users\www\Documents\Вузик\GameWinForm\View\missile.png");
+            _playerSprite = new Bitmap(model.Player.Width, model.Player.Height);
+            using (Graphics g = Graphics.FromImage(_playerSprite)) g.Clear(Color.Green);
+            _missileSprite = new Bitmap(15, 15);
+            using (Graphics g = Graphics.FromImage(_missileSprite)) g.Clear(Color.Black);
         }
 
         public void Render(Graphics graphics)
