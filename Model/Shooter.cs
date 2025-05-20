@@ -14,17 +14,26 @@ namespace GameWinForm.Model
         public Vector2 AttackTrajectory { get; protected set; }
         protected Timer _attackTimer = new Timer { Interval = 700 };
         protected Timer _trajectoryAttackTimer = new Timer { Interval = 3000 };
-        private Boss _boss;
 
         public Shooter(Player player, Vector2 position, Vector2[] trajectory, int width, int height, int hp)
             : base(player, position, trajectory, width, height, hp)
         {
             AttackTrajectory = Vector2.Zero;
-            SetTimers();
         }
 
-        protected void SetTimers()
+        public Shooter(Player player, Boss boss, Vector2 position, int width, int height, int hp)
+            : base(player, boss, position, width, height, hp)
         {
+            AttackTrajectory = Vector2.Zero;
+        }
+
+        protected override void SetTimers()
+        {
+            if (Trajectory != null && Trajectory.Length != 0 && _boss == null)
+            {
+                _moveTimer.Tick += MoveOnTrajectory;
+                _moveTimer.Start();
+            }
             _attackTimer.Tick += Attack;
             _trajectoryAttackTimer.Tick += ShowTrajectoryAttack;
             _trajectoryAttackTimer.Start();

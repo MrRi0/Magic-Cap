@@ -1,4 +1,5 @@
-﻿using GameWinForm.Model;
+﻿using GameWinForm.Core;
+using GameWinForm.Model;
 using Microsoft.VisualBasic.ApplicationServices;
 using System;
 using System.Collections.Generic;
@@ -34,6 +35,7 @@ namespace GameWinForm.View
             DrawPlayer(graphics);
             DrawEnemies(graphics);
             DrawBulletHellStage(graphics);
+            DrawBoss(graphics);
         }
 
         private void DrawPlayer(Graphics graphics)
@@ -45,6 +47,25 @@ namespace GameWinForm.View
                     _playerSprite.Width,
                     _playerSprite.Height);
                 DrawPlayerMissile(graphics);
+        }
+
+        private void DrawBoss(Graphics graphics)
+        {
+            var boss = _model.Boss;
+            if (boss != null && !_model.Boss.IsDeath())
+            {
+                graphics.DrawRectangle(new Pen(Color.Red), boss.Position.X, boss.Position.Y, boss.Width, boss.Height);
+                if (boss.AttackTrajectory != Vector2.Zero)
+                {
+                    var normalizedTrajectory = boss.AttackTrajectory.Normalize();
+                    var widthLine = normalizedTrajectory.X * boss.Height + normalizedTrajectory.Y * boss.Width;
+                    graphics.DrawLine(new Pen(attackColor, widthLine),
+                        boss.GetCenterPosition().X,
+                        boss.GetCenterPosition().Y,
+                        boss.AttackTrajectory.X,
+                        boss.AttackTrajectory.Y);
+                }
+            }
         }
 
         private void DrawPlayerMissile(Graphics graphics)
@@ -78,7 +99,9 @@ namespace GameWinForm.View
                 if (enemy is Dasher && ((Dasher)enemy).AttackTrajectory != Vector2.Zero)
                 {
                     var dasher = (Dasher)enemy;
-                    graphics.DrawLine(new Pen(attackColor, 50),
+                    var normalizedTrajectory = dasher.AttackTrajectory.Normalize();
+                    var widthLine = normalizedTrajectory.X * dasher.Height + normalizedTrajectory.Y * dasher.Width;
+                    graphics.DrawLine(new Pen(attackColor, widthLine),
                         dasher.GetCenterPosition().X,
                         dasher.GetCenterPosition().Y,
                         dasher.AttackTrajectory.X,

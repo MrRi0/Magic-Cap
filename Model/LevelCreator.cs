@@ -1,4 +1,5 @@
 ﻿using Accessibility;
+using GameWinForm.Core;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -64,19 +65,44 @@ namespace GameWinForm.Model
             return result;
         }
 
-        private static List<Missile> GetBulletHellStage()
+        private static List<Missile> GetGridBulletHellStage(int countVerticalBullet, int countHorizontalBullet)
         {
             var result = new List<Missile>();
-            for (int i = 0; i < 6; i++)
+            for (int i = 0; i < countVerticalBullet; i++)
             {
                 result.Add(
-                    new Missile(new Vector2(_windowWidth / 7 * (i + 1), -10), 
-                    new Vector2(_windowWidth / 7 * (i + 1), _windowHeight), 
+                    new Missile(new Vector2(_windowWidth / (countVerticalBullet + 1) * (i + 1), -10), 
+                    new Vector2(_windowWidth / (countVerticalBullet + 1) * (i + 1), _windowHeight), 
                     1));
+                if (i < countHorizontalBullet)
+                {
+                    result.Add(
+                    new Missile(new Vector2(-10, _windowHeight / (countHorizontalBullet + 1) * (i + 1)),
+                    new Vector2(_windowWidth, _windowHeight / (countHorizontalBullet + 1) * (i + 1)),
+                    1));
+                }
+            }
+            return result;
+        }
+
+        private static List<Missile> GetDiagonalGridBulletHellStage(int countTopBullet, int countDownBullet)
+        {
+            var result = new List<Missile>();
+            var diagonalLeftTopToRightDown = new Vector2(_windowWidth, _windowHeight);
+            var diagonalVectorRightTopToLeftDown = new Vector2(_windowWidth, -_windowHeight) / 2;
+            var diagonalRightTopToLeftDown = new Vector2(_windowWidth, _windowHeight);
+            var diagonalVectorLeftTopToRightDown = new Vector2(_windowWidth, -_windowHeight) / 2;
+            for (int i = 0; i < countTopBullet; i++)
+            {
                 result.Add(
-                    new Missile(new Vector2(-10, _windowHeight / 7 * (i + 1)), 
-                    new Vector2(_windowWidth, _windowHeight / 7 * (i + 1)), 
-                    1));
+                    new Missile(diagonalLeftTopToRightDown.Normalize() * diagonalLeftTopToRightDown * (i + 1) / (countTopBullet + 1) + diagonalVectorRightTopToLeftDown,
+                    diagonalLeftTopToRightDown.Normalize() * diagonalLeftTopToRightDown * (i + 1) / (countTopBullet + 1) - diagonalVectorRightTopToLeftDown, 1));
+            }
+            for (int i = 0; i < countDownBullet; i++)
+            {
+                result.Add(
+                    new Missile(diagonalRightTopToLeftDown.Normalize() * diagonalRightTopToLeftDown * (i + 1) / (countDownBullet + 1) + diagonalVectorLeftTopToRightDown + new Vector2(_windowWidth, 0),
+                    diagonalRightTopToLeftDown.Normalize() * diagonalRightTopToLeftDown * (i + 1) / (countDownBullet + 1) - diagonalVectorLeftTopToRightDown + new Vector2(_windowWidth, 0), 1));
             }
             return result;
         }
@@ -85,28 +111,34 @@ namespace GameWinForm.Model
         {
             var stagesNum1 = new Queue<Stage>();
             stagesNum1.Enqueue(new Stage(new List<Enemy> { new Enemy(player, new Vector2(-100, _windowHeight / 2), new[] { new Vector2(_windowWidth / 4, _windowHeight / 2) }, 50, 50, 10) }, new List<Missile>()));
-            //stagesNum1.Enqueue(new Stage(new List<Enemy>(), new List<Missile> { new Missile(new Vector2(-20, _windowHeight / 2), new Vector2(_windowWidth, _windowHeight / 2), 1) }));
-            //stagesNum1.Enqueue(new Stage(GetEnemiesInCircle<Enemy>(player, 4, 50, 50, 10), new List<Missile>()));
-            //stagesNum1.Enqueue(new Stage(new List<Enemy> { new Shooter(player, new Vector2(-100, _windowHeight / 2), new[] { new Vector2(_windowWidth / 4, _windowHeight / 2) }, 50, 50, 10) }, new List<Missile>()));
-            //stagesNum1.Enqueue(new Stage(new List<Enemy>(), GetBulletHellStage()));
-            //stagesNum1.Enqueue(new Stage(new List<Enemy> { new Dasher(player, new Vector2(-100, _windowHeight / 2), new[] { new Vector2(_windowWidth / 4, _windowHeight / 2) }, 50, 50, 10) }, new List<Missile>()));
-            //stagesNum1.Enqueue(new Stage(GetEnemiesInCircle<Dasher>(player, 2, 50, 50, 10), new List<Missile>()));
-            //stagesNum1.Enqueue(new Stage(GetEnemiesInCircle<Shooter>(player, 6, 50, 50, 5), new List<Missile>()));
-            stagesNum1.Enqueue(new Stage(new List<Enemy> { new Boss(player, new Vector2(_windowWidth / 4, -200), new[] { new Vector2(_windowWidth / 4, 0) }, _windowWidth / 2, 200, 15) }, new List<Missile>()));
+            stagesNum1.Enqueue(new Stage(new List<Enemy>(), new List<Missile> { new Missile(new Vector2(-20, _windowHeight / 2), new Vector2(_windowWidth, _windowHeight / 2), 1) }));
+            stagesNum1.Enqueue(new Stage(GetEnemiesInCircle<Enemy>(player, 4, 50, 50, 10), new List<Missile>()));
+            stagesNum1.Enqueue(new Stage(new List<Enemy> { new Shooter(player, new Vector2(-100, _windowHeight / 2), new[] { new Vector2(_windowWidth / 4, _windowHeight / 2) }, 50, 50, 10) }, new List<Missile>()));
+            stagesNum1.Enqueue(new Stage(new List<Enemy>(), GetGridBulletHellStage(5, 3)));
+            stagesNum1.Enqueue(new Stage(new List<Enemy>(), GetGridBulletHellStage(1, 1)));
+            //stagesNum1.Enqueue(new Stage(new List<Enemy>(), GetDiagonalGridBulletHellStage(1, 1)));
+            //stagesNum1.Enqueue(new Stage(new List<Enemy>(), GetDiagonalGridBulletHellStage(2, 2)));
+            stagesNum1.Enqueue(new Stage(new List<Enemy> { new Dasher(player, new Vector2(-100, _windowHeight / 2), new[] { new Vector2(_windowWidth / 4, _windowHeight / 2) }, 150, 50, 10) }, new List<Missile>()));
+            stagesNum1.Enqueue(new Stage(GetEnemiesInCircle<Dasher>(player, 2, 50, 50, 10), new List<Missile>()));
+            stagesNum1.Enqueue(new Stage(GetEnemiesInCircle<Shooter>(player, 6, 50, 50, 5), new List<Missile>()));
 
-            var bossNum1 = new Boss(player, new Vector2(_windowWidth / 4, -200), new[] { new Vector2(_windowWidth / 4, 0) }, _windowWidth / 2, 200, 15);
+            var bossNum1 = new Boss(player, new Vector2(_windowWidth / 4, -200), new[] { new Vector2(_windowWidth / 4, 0) }, _windowWidth / 2, 200, 50);
             var bossStages = new List<Stage>();
             bossStages.Add(new Stage(new List<Enemy>
             {
-                new Enemy(player, bossNum1, bossNum1.Position + new Vector2(-25, bossNum1.Height - 25), 50, 50, 10),
-                new Enemy(player, bossNum1, bossNum1.Position + new Vector2(bossNum1.Width / 2 - 25, bossNum1.Height - 25), 50, 50, 10),
-                new Enemy(player, bossNum1, bossNum1.Position + new Vector2(bossNum1.Width - 25, bossNum1.Height - 25), 50, 50, 10)
+                new Shooter(player, bossNum1, bossNum1.Position + new Vector2(-25, bossNum1.Height - 25), 50, 50, 10),
+                new Shooter(player, bossNum1, bossNum1.Position + new Vector2(bossNum1.Width / 2 - 25, bossNum1.Height - 25), 50, 50, 10),
+                new Shooter(player, bossNum1, bossNum1.Position + new Vector2(bossNum1.Width - 25, bossNum1.Height - 25), 50, 50, 10)
             }, new List<Missile>()));
-
+            bossStages.Add(new Stage(new List<Enemy>
+            {
+                new Shooter(player, bossNum1, bossNum1.Position + new Vector2(-25, bossNum1.Height - 25), 50, 50, 10),
+                new Shooter(player, bossNum1, bossNum1.Position + new Vector2(bossNum1.Width / 2 - 25, bossNum1.Height - 25), 50, 50, 10),
+                new Shooter(player, bossNum1, bossNum1.Position + new Vector2(bossNum1.Width - 25, bossNum1.Height - 25), 50, 50, 10)
+            }, new List<Missile>()));
             var bossFightNum1 = new BossStage(
-                new Boss(player, new Vector2(_windowWidth / 4, -200), new[] { new Vector2(_windowWidth / 4, 0) }, _windowWidth / 2, 200, 15),
-                bossStages,
-                new[] { new Vector2(0, -200), new Vector2(0, _windowHeight), new Vector2(_windowWidth / 2, _windowHeight), new Vector2(_windowWidth / 2, -200) });
+                bossNum1,
+                bossStages);
             return new Level(1, stagesNum1, bossFightNum1);
         }
     }

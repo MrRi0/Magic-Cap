@@ -27,6 +27,8 @@ namespace GameWinForm.Model
 
         protected bool _isBorn = false;
 
+        protected Vector2 _positionToBoss;
+
         public event Action<Vector2> PositionChanged;
 
         public Enemy()
@@ -56,14 +58,12 @@ namespace GameWinForm.Model
             Height = height;
             _player = player;
             _boss = boss;
-            Trajectory = boss.Trajectory.Select(x => x + (Position - boss.Position)).ToArray();
-            if (Trajectory.Length != 0)
-                _targetPosition = Trajectory[_indexTrajectory];
+            _positionToBoss = Position - boss.Position;
         }
 
-        protected void SetTimers()
+        protected virtual void SetTimers()
         {
-            if (Trajectory.Length != 0)
+            if (Trajectory != null && Trajectory.Length != 0 && _boss == null)
             {
                 _moveTimer.Tick += MoveOnTrajectory;
                 _moveTimer.Start();
@@ -77,8 +77,13 @@ namespace GameWinForm.Model
                 SetTimers();
                 _isBorn = true;
             }
-            Move();
-            Position += Velocity;
+            if (_boss != null)
+                Position = _boss.Position + _positionToBoss;
+            else
+            {
+                Move();
+                Position += Velocity;
+            }
             foreach (var missile in Missiles)
             {
                 missile.Update();

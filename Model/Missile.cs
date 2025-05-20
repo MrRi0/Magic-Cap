@@ -57,7 +57,7 @@ namespace GameWinForm.Model
 
         public bool IsDeath()
         {
-            return Position.X > _windowWidth + 20 || Position.X < -20 || Position.Y > _windowHeight + 20 || Position.Y < -20;
+            return Position.X > _windowWidth + 200 || Position.X < -200 || Position.Y > _windowHeight + 200 || Position.Y < -200;
         }
 
         public void Update()

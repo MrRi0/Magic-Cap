@@ -23,7 +23,7 @@ namespace GameWinForm.Model
         {
             if (_stages.Count != 0)
                 return _stages.Dequeue();
-            return null;
+            return Stage.Empty;
         }
 
         public BossStage GetBossStage() => _bossStage;

@@ -16,6 +16,7 @@ namespace GameWinForm.Model
     {
         public Player Player { get; private set; }
         public List<Enemy> Enemies { get; private set; }
+        public Boss Boss { get; private set; }
         public Level Level { get; private set; }
 
         public List<Missile> BulletHellStage { get; private set; }
@@ -39,14 +40,17 @@ namespace GameWinForm.Model
             Player.Update();
             if (Enemies == null) return;
             if (BulletHellStage == null) return;
-            if (_bossFight != null)
-                _bossFight.Update();
+            if (Boss != null)
+            { 
+                BossFightUpdate(); 
+                CheckBossCollisions(); 
+            }
 
             for (var i = 0; i < Enemies.Count; i++)
             {
                 Enemies[i].Update();
-                CheckPlayerMissileCollisions(i);
-                CheckEnemyMissileCollisions(i);
+                CheckPlayerMissileCollisions(Enemies[i]);
+                CheckEnemyMissileCollisions(Enemies[i]);
                 if (CheckCollisions(Enemies[i], Player))
                     Player.TakeDamage(Enemies[i].ContactDamage);
                 if (Enemies[i].IsDeath())
@@ -54,27 +58,42 @@ namespace GameWinForm.Model
             }
             CheckBulletHellCollisions();
 
-            if (_bossFight != null && _bossFight.StageIsSwitch)
+            if (Enemies.Count == 0 && BulletHellStage.Count == 0 && _bossFight != null)
             {
-                _stage = _bossFight.CurrentStage;
-                return;
+                Boss.GetNextStage();
+                _stageTimer.Start(); 
             }
-
-            if (Enemies.Count == 0 && BulletHellStage.Count == 0)
+            else if (_stage.IsEmpty())
                 _stageTimer.Start();
         }
 
         private void GoNextStage(object sender, EventArgs e)
         {
-            _stage = Level.GetNextStage();
-            if (_stage == null)
+            if (_bossFight != null)
+            {
+                _stage = _bossFight.GetNextStage();
+                Enemies = _stage.Enemies.ToList();
+                BulletHellStage = _stage.Missiles.ToList();
+            }
+            else
+            { 
+                _stage = Level.GetNextStage();
+                Enemies = _stage.Enemies;
+                BulletHellStage = _stage.Missiles;
+            }
+            if (_stage.IsEmpty())
             {
                 _bossFight = Level.GetBossStage();
-                _stage = _bossFight.CurrentStage;
+                Boss = _bossFight.Boss;
+                Enemies = _stage.Enemies.ToList();
+                BulletHellStage = _stage.Missiles.ToList();
             }
-            Enemies = _stage.Enemies;
-            BulletHellStage = _stage.Missiles;
             _stageTimer.Stop();
+        }
+
+        private void BossFightUpdate()
+        {
+            Boss.Update();
         }
 
         private void CheckBulletHellCollisions()
@@ -92,32 +111,39 @@ namespace GameWinForm.Model
             }
         }
 
-        private void CheckEnemyMissileCollisions(int i)
+        private void CheckEnemyMissileCollisions(Enemy enemy)
         {
-            for (var k = 0; k < Enemies[i].Missiles.Count; k++)
+            for (var k = 0; k < enemy.Missiles.Count; k++)
             {
-                if (CheckCollisions(Enemies[i].Missiles[k], Player))
+                if (CheckCollisions(enemy.Missiles[k], Player))
                 {
-                    Player.TakeDamage(Enemies[i].Missiles[k].Damage);
-                    Enemies[i].Missiles.Remove(Enemies[i].Missiles[k]);
+                    Player.TakeDamage(enemy.Missiles[k].Damage);
+                    enemy.Missiles.Remove(enemy.Missiles[k]);
                 }
-                else if (Enemies[i].Missiles[k].IsDeath())
-                    Enemies[i].Missiles.Remove(Enemies[i].Missiles[k]);
+                else if (enemy.Missiles[k].IsDeath())
+                    enemy.Missiles.Remove(enemy.Missiles[k]);
             }
         }
 
-        private void CheckPlayerMissileCollisions(int i)
+        private void CheckPlayerMissileCollisions(Enemy enemy)
         {
             for (var j = 0; j < Player.Missiles.Count; j++)
             {
-                if (CheckCollisions(Player.Missiles[j], Enemies[i]))
+                if (CheckCollisions(Player.Missiles[j], enemy))
                 {
-                    Enemies[i].TakeDamage(Player.Missiles[j].Damage);
+                    enemy.TakeDamage(Player.Missiles[j].Damage);
                     Player.Missiles.Remove(Player.Missiles[j]);
                 }
                 else if (Player.Missiles[j].IsDeath())
                     Player.Missiles.Remove(Player.Missiles[j]);
             }
+        }
+
+        private void CheckBossCollisions()
+        {
+            CheckPlayerMissileCollisions(Boss);
+            if (CheckCollisions(Player, Boss))
+                Player.TakeDamage(Boss.ContactDamage);
         }
 
         private bool CheckCollisions(Entity entity1, Entity entity2)

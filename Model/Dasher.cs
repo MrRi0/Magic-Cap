@@ -21,9 +21,8 @@ namespace GameWinForm.Model
         {
             AttackTrajectory = Vector2.Zero;
             _speed = 15f;
-            SetTimers();
         }
-        protected void SetTimers()
+        protected override void SetTimers()
         {
             _attackTimer.Tick += Attack;
             _trajectoryAttackTimer.Tick += ShowTrajectoryAttack;
