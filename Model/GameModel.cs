@@ -18,6 +18,7 @@ namespace GameWinForm.Model
         public List<Enemy> Enemies { get; private set; }
         public Boss Boss { get; private set; }
         public Level Level { get; private set; }
+        public bool IsPause { get; set; }
 
         public List<Missile> BulletHellStage { get; private set; }
 
@@ -33,6 +34,7 @@ namespace GameWinForm.Model
             Enemies = _stage.Enemies;
             BulletHellStage = _stage.Missiles;
             _stageTimer.Tick += GoNextStage;
+            IsPause = false;
         }
 
         public void Update()

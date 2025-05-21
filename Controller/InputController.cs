@@ -21,13 +21,15 @@ namespace GameWinForm.Controller
         public void HandleKeyDown(Keys key)
         {
             _keyStates[key] = true;
-            ProcessInput();
+            if (!_model.IsPause)
+                ProcessInput();
         }
 
         public void HandleKeyUp(Keys key)
         {
             _keyStates[key] = false;
-            ProcessInput();
+            if (!_model.IsPause)
+                ProcessInput();
         }
 
         private void ProcessInput()
@@ -38,7 +40,6 @@ namespace GameWinForm.Controller
             if (_keyStates.GetValueOrDefault(Keys.W, false)) moveDirection.Y -= 1;
             if (_keyStates.GetValueOrDefault(Keys.S, false)) moveDirection.Y += 1;
             if (_keyStates.GetValueOrDefault(Keys.Space, false)) _model.Player.Dash(moveDirection);
-            //if (_keyStates.GetValueOrDefault(Keys.Q, false)) _model.Enemies[0].Move(_model.Player);
 
                 _model.Player.LastMoveDirection = moveDirection;
             if (moveDirection != Vector2.Zero)

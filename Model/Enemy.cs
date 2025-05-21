@@ -43,7 +43,7 @@ namespace GameWinForm.Model
             Position = position;
             Width = width;
             Height = height;
-            this._player = player;
+            _player = player;
             Trajectory = trajectory;
             if (Trajectory.Length != 0)
                 _targetPosition = Trajectory[_indexTrajectory];
@@ -93,8 +93,9 @@ namespace GameWinForm.Model
 
         public void Move()
         {
-            if (Position.X > _targetPosition.X - _speed && Position.X < _targetPosition.X + _speed
-                && Position.Y > _targetPosition.Y - _speed && Position.Y < _targetPosition.Y + _speed)
+            if ((Position.X > _targetPosition.X - _speed && Position.X < _targetPosition.X + _speed
+                && Position.Y > _targetPosition.Y - _speed && Position.Y < _targetPosition.Y + _speed) 
+                || _targetPosition == Vector2.Zero)
             { 
                 Velocity = Vector2.Zero;
                 return;

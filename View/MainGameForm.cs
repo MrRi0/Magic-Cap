@@ -10,9 +10,11 @@ namespace GameWinForm.View
         private readonly InputController _inputController;
         private readonly MouseController _mouseController;
         private readonly GameView _gameView;
+        private readonly LevelSelectForm _levelSelectForm;
 
-        public MainForm()
+        public MainForm(LevelSelectForm levelSelectForm)
         {
+            _levelSelectForm = levelSelectForm;
             _model = new GameModel();
             _inputController = new InputController(_model);
             _mouseController = new MouseController(_model);
@@ -29,6 +31,9 @@ namespace GameWinForm.View
 
             KeyPreview = true;
             WindowState = FormWindowState.Maximized;
+            FormBorderStyle = FormBorderStyle.FixedDialog;
+            MaximizeBox = false;
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
         }
 
         private void OnMouseDown(object sender, MouseEventArgs e)
@@ -49,6 +54,8 @@ namespace GameWinForm.View
         protected override void OnKeyDown(KeyEventArgs e)
         {
             _inputController.HandleKeyDown(e.KeyCode);
+            if (e.KeyCode == Keys.Escape)
+                _gameView.PauseGame();
             base.OnKeyDown(e);
         }
 

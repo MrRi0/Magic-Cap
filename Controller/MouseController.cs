@@ -35,7 +35,8 @@ namespace GameWinForm.Controller
             if (e.Button == MouseButtons.Left)
             {
                 _isLeftButtonDown = true;
-                ProcessInput();
+                if (!_model.IsPause)
+                    ProcessInput();
             }
         }
 
@@ -44,7 +45,8 @@ namespace GameWinForm.Controller
             if (e.Button == MouseButtons.Left)
             {
                 _isLeftButtonDown = false;
-                ProcessInput();
+                if (!_model.IsPause)
+                    ProcessInput();
             }
         }
 

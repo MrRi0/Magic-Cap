@@ -110,7 +110,8 @@ namespace GameWinForm.Model
         private static Level CreateLevelNum1(Player player)
         {
             var stagesNum1 = new Queue<Stage>();
-            stagesNum1.Enqueue(new Stage(new List<Enemy> { new Enemy(player, new Vector2(-100, _windowHeight / 2), new[] { new Vector2(_windowWidth / 4, _windowHeight / 2) }, 50, 50, 10) }, new List<Missile>()));
+            stagesNum1.Enqueue(new Stage(new List<Enemy> { new Enemy(player, new Vector2(_windowWidth / 2, _windowHeight / 2 - 500), new Vector2[0], 1, 1000, 10), new Enemy(player, new Vector2(_windowWidth / 2 - 1000, _windowHeight / 2), new Vector2[0], 2000, 1, 10) }, new List<Missile>()));
+            stagesNum1.Enqueue(new Stage(new List<Enemy> { new Enemy(player, new Vector2(_windowWidth / 2, _windowHeight / 2), new[] { new Vector2(_windowWidth / 4, _windowHeight / 2) }, 50, 50, 10) }, new List<Missile>()));
             stagesNum1.Enqueue(new Stage(new List<Enemy>(), new List<Missile> { new Missile(new Vector2(-20, _windowHeight / 2), new Vector2(_windowWidth, _windowHeight / 2), 1) }));
             stagesNum1.Enqueue(new Stage(GetEnemiesInCircle<Enemy>(player, 4, 50, 50, 10), new List<Missile>()));
             stagesNum1.Enqueue(new Stage(new List<Enemy> { new Shooter(player, new Vector2(-100, _windowHeight / 2), new[] { new Vector2(_windowWidth / 4, _windowHeight / 2) }, 50, 50, 10) }, new List<Missile>()));
