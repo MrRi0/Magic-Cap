@@ -19,8 +19,8 @@ namespace GameWinForm.Model
         public List<Missile> Missiles { get; set; }
         public int ContactDamage { get; protected set; } = 1;
 
-        private Timer _framesInvulnerability = new Timer { Interval = 200 };
-        private bool _isInvulnerability = false;
+        private Timer _framesInvulnerability = new Timer { Interval = 400 };
+        public bool IsInvulnerability = false;
 
         public Entity()
         {
@@ -28,10 +28,10 @@ namespace GameWinForm.Model
         }
         public void TakeDamage(int damage)
         {
-            if (!_isInvulnerability)
+            if (!IsInvulnerability)
             { 
                 Hp -= damage;
-                _isInvulnerability = true;
+                IsInvulnerability = true;
                 _framesInvulnerability.Start();
             }
         }
@@ -48,7 +48,7 @@ namespace GameWinForm.Model
 
         private void RemoveInvulnerability(object sender, EventArgs e)
         {
-            _isInvulnerability = false;
+            IsInvulnerability = false;
             _framesInvulnerability.Stop();
         }
     }

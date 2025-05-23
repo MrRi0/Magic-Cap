@@ -19,9 +19,9 @@ namespace GameWinForm.Model
 
         protected Vector2 _targetPosition;
 
-        protected float _speed = 5f;
+        protected float _speed = 8f;
 
-        protected Timer _moveTimer = new Timer { Interval = 4000 };
+        protected Timer _moveTimer = new Timer { Interval = 3000 };
 
         protected int _indexTrajectory = 0;
 

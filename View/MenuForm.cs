@@ -1,4 +1,5 @@
-﻿using System;
+﻿using GameWinForm.Core;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -15,14 +16,16 @@ namespace GameWinForm.View
         private LevelSelectForm _levelSelectForm;
         public MenuForm()
         {
+            DoubleBuffered = true;
+            SetStyle(ControlStyles.OptimizedDoubleBuffer, true);
+            _levelSelectForm = new LevelSelectForm(this);
+            _levelSelectForm.Hide();
             InitializeComponent();
         }
 
         private void PlayButtonClick(object sender, EventArgs e)
         {
-            _levelSelectForm = new LevelSelectForm(this);
-            _levelSelectForm.Show();
-            Hide();
+            this.SwitchForms(_levelSelectForm);
         }
 
         private void ExitButtonClick(object sender, EventArgs e)

@@ -19,13 +19,15 @@ namespace GameWinForm.Model
         public Boss(Player player, Vector2 position, Vector2[] trajectory, int width, int height, int hp)
             : base(player, position, trajectory, width, height, hp)
         {
+            _speed = 10f;
             AttackTrajectory = Vector2.Zero;
         }
 
         public void GetNextStage()
         {
             _moveTimer.Stop();
-            _targetPosition = Position + new Vector2(0, -Height);
+            if (Position.Y >= -Height)
+                _targetPosition = Position + new Vector2(0, -Height);
             _isBorn = false;
         }
     }

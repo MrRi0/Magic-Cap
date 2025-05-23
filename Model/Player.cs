@@ -12,12 +12,22 @@ namespace GameWinForm.Model
     public class Player : Entity
     {
         public Vector2 LastMoveDirection { get; set; }
+        public int DashCoolDown { get; private set; }
 
         public event Action<Vector2> PositionChanged;
+
+        private int _dashCoolDownTime = 2000;
+        private int _attackCoolDownTime = 250;
+        private bool _attackIsReady;
+        private Timer _dashRechargeTimer = new Timer { Interval = 20 };
+        private Timer _attackRechargeTimer = new Timer();
 
         private const float _drag = 0.9f;
         private const float _acceleration = 6f;
         private const float _dashSpeed = 100f;
+
+        private readonly int _windowHeight = Screen.PrimaryScreen.Bounds.Height;
+        private readonly int _windowWidth = Screen.PrimaryScreen.Bounds.Width;
 
         public Player()
         {
@@ -25,6 +35,12 @@ namespace GameWinForm.Model
             Hp = 5;
             Width = 90;
             Height = 140;
+            DashCoolDown = _dashCoolDownTime;
+            Position = new Vector2((_windowWidth - Width) / 2, (_windowHeight - Height) / 2);
+            _attackIsReady = true;
+            _dashRechargeTimer.Tick += RechargeDash;
+            _attackRechargeTimer.Interval = _attackCoolDownTime;
+            _attackRechargeTimer.Tick += RechargeAttack;
         }
 
         public void Update()
@@ -54,12 +70,35 @@ namespace GameWinForm.Model
 
         public void Dash(Vector2 direction)
         {
-            Position += new Vector2(direction.X, direction.Y).Normalize() * _dashSpeed;
+            if (DashCoolDown >= _dashCoolDownTime)
+            {
+                Position += new Vector2(direction.X, direction.Y).Normalize() * _dashSpeed;
+                DashCoolDown = 0;
+                _dashRechargeTimer.Start();
+            }
         }
 
         public void Attack(Vector2 targetPosition)
         {
-            Missiles.Add(new Missile(this, targetPosition, 1));
+            if (_attackIsReady)
+            { 
+                Missiles.Add(new Missile(this, targetPosition, 1));
+                _attackIsReady = false;
+                _attackRechargeTimer.Start();
+            }
+        }
+
+        private void RechargeDash(object sender, EventArgs e)
+        {
+            DashCoolDown += _dashCoolDownTime / _dashRechargeTimer.Interval;
+            if (DashCoolDown >= _dashCoolDownTime)
+                _dashRechargeTimer.Stop();
+        }
+
+        private void RechargeAttack(object sender, EventArgs e)
+        {
+            _attackIsReady = true;
+            _attackRechargeTimer.Stop();
         }
     }
 }

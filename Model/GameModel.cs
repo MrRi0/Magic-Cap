@@ -24,7 +24,8 @@ namespace GameWinForm.Model
 
         private Stage _stage;
         private BossStage _bossFight;
-        private Timer _stageTimer = new Timer { Interval = 1600 };
+        private Timer _stageTimer = new Timer { Interval = 1400 };
+        private Timer _bossStageTimer = new Timer { Interval = 800 };
 
         public GameModel()
         {
@@ -34,6 +35,7 @@ namespace GameWinForm.Model
             Enemies = _stage.Enemies;
             BulletHellStage = _stage.Missiles;
             _stageTimer.Tick += GoNextStage;
+            _bossStageTimer.Tick += GoNextStage;
             IsPause = false;
         }
 
@@ -63,7 +65,7 @@ namespace GameWinForm.Model
             if (Enemies.Count == 0 && BulletHellStage.Count == 0 && _bossFight != null)
             {
                 Boss.GetNextStage();
-                _stageTimer.Start(); 
+                _bossStageTimer.Start();
             }
             else if (_stage.IsEmpty())
                 _stageTimer.Start();
@@ -91,6 +93,7 @@ namespace GameWinForm.Model
                 BulletHellStage = _stage.Missiles.ToList();
             }
             _stageTimer.Stop();
+            _bossStageTimer.Stop();
         }
 
         private void BossFightUpdate()

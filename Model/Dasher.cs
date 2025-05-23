@@ -14,7 +14,7 @@ namespace GameWinForm.Model
     {
         public Vector2 AttackTrajectory { get; protected set; }
         protected Timer _attackTimer = new Timer { Interval = 800 };
-        protected Timer _trajectoryAttackTimer = new Timer { Interval = 3000 };
+        protected Timer _trajectoryAttackTimer = new Timer { Interval = 2000 };
 
         public Dasher(Player player, Vector2 position, Vector2[] trajectory, int width, int height, int hp) 
             : base(player, position, trajectory, width, height, hp)
@@ -39,7 +39,7 @@ namespace GameWinForm.Model
 
         protected void ShowTrajectoryAttack(object sender, EventArgs e)
         {
-            AttackTrajectory = (_player.GetCenterPosition() - Position) * 1.4f + Position;
+            AttackTrajectory = (_player.GetCenterPosition() - Position) * 1.5f + Position;
             _attackTimer.Start();
         }
     }

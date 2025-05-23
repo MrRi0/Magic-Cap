@@ -12,36 +12,34 @@ namespace GameWinForm.View
 {
     public class GameView : UserControl
     {
+        public bool IsPause { get; private set; }
         private readonly GameModel _model;
         private readonly System.Windows.Forms.Timer _gameLoop;
-        private bool _isPause;
-        private PauseForm _pauseForm;
         public GameView(GameModel model)
         {
             _model = model;
             DoubleBuffered = true;
-            _isPause = false;
-            _pauseForm = new PauseForm();
+            IsPause = false;
             _gameLoop = new System.Windows.Forms.Timer { Interval = 16 };
             _gameLoop.Tick += GameLoop_Tick;
             _gameLoop.Start();
-            
         }
 
-        public void PauseGame()
+        public void PauseGame(PauseForm pauseForm)
         {
-            _isPause = !_isPause;
-            if (_isPause)
+            IsPause = !IsPause;
+            if (IsPause)
             {
                 _model.IsPause = true;
-                _pauseForm.Show();
                 _gameLoop.Stop();
+                pauseForm.BringToFront();
+                pauseForm.Show();
             }
             else
             {
                 _model.IsPause = false;
-                _pauseForm.Hide();
                 _gameLoop.Start();
+                pauseForm.Hide();
             }
         }
 

@@ -115,11 +115,9 @@ namespace GameWinForm.Model
             stagesNum1.Enqueue(new Stage(new List<Enemy>(), new List<Missile> { new Missile(new Vector2(-20, _windowHeight / 2), new Vector2(_windowWidth, _windowHeight / 2), 1) }));
             stagesNum1.Enqueue(new Stage(GetEnemiesInCircle<Enemy>(player, 4, 50, 50, 10), new List<Missile>()));
             stagesNum1.Enqueue(new Stage(new List<Enemy> { new Shooter(player, new Vector2(-100, _windowHeight / 2), new[] { new Vector2(_windowWidth / 4, _windowHeight / 2) }, 50, 50, 10) }, new List<Missile>()));
-            stagesNum1.Enqueue(new Stage(new List<Enemy>(), GetGridBulletHellStage(5, 3)));
-            stagesNum1.Enqueue(new Stage(new List<Enemy>(), GetGridBulletHellStage(1, 1)));
-            //stagesNum1.Enqueue(new Stage(new List<Enemy>(), GetDiagonalGridBulletHellStage(1, 1)));
-            //stagesNum1.Enqueue(new Stage(new List<Enemy>(), GetDiagonalGridBulletHellStage(2, 2)));
-            stagesNum1.Enqueue(new Stage(new List<Enemy> { new Dasher(player, new Vector2(-100, _windowHeight / 2), new[] { new Vector2(_windowWidth / 4, _windowHeight / 2) }, 150, 50, 10) }, new List<Missile>()));
+            //stagesNum1.Enqueue(new Stage(new List<Enemy>(), GetGridBulletHellStage(5, 3)));
+            //stagesNum1.Enqueue(new Stage(new List<Enemy>(), GetGridBulletHellStage(1, 1)));
+            stagesNum1.Enqueue(new Stage(new List<Enemy> { new Dasher(player, new Vector2(-100, _windowHeight / 2), new[] { new Vector2(_windowWidth / 4, _windowHeight / 2) }, 50, 50, 10) }, new List<Missile>()));
             stagesNum1.Enqueue(new Stage(GetEnemiesInCircle<Dasher>(player, 2, 50, 50, 10), new List<Missile>()));
             stagesNum1.Enqueue(new Stage(GetEnemiesInCircle<Shooter>(player, 6, 50, 50, 5), new List<Missile>()));
 
@@ -131,6 +129,23 @@ namespace GameWinForm.Model
                 new Shooter(player, bossNum1, bossNum1.Position + new Vector2(bossNum1.Width / 2 - 25, bossNum1.Height - 25), 50, 50, 10),
                 new Shooter(player, bossNum1, bossNum1.Position + new Vector2(bossNum1.Width - 25, bossNum1.Height - 25), 50, 50, 10)
             }, new List<Missile>()));
+            bossStages.Add(new Stage(new List<Enemy>(), GetGridBulletHellStage(2, 2)));
+            bossStages.Add(new Stage(new List<Enemy>(), GetGridBulletHellStage(3, 3)));
+            bossStages.Add(new Stage(new List<Enemy>(), GetGridBulletHellStage(4, 4)));
+            bossStages.Add(new Stage(new List<Enemy>
+            {
+                new Shooter(player, bossNum1, bossNum1.Position + new Vector2(-25, bossNum1.Height - 25), 50, 50, 10),
+                new Shooter(player, bossNum1, bossNum1.Position + new Vector2(bossNum1.Width / 2 - 25, bossNum1.Height - 25), 50, 50, 10),
+                new Shooter(player, bossNum1, bossNum1.Position + new Vector2(bossNum1.Width - 25, bossNum1.Height - 25), 50, 50, 10)
+            }, new List<Missile>()));
+            bossStages.Add(new Stage(GetEnemiesInCircle<Shooter>(player, 4, 75, 75, 5), new List<Missile>()));
+            bossStages.Add(new Stage(new List<Enemy>
+            {
+                new Shooter(player, bossNum1, bossNum1.Position + new Vector2(-25, bossNum1.Height - 25), 50, 50, 10),
+                new Shooter(player, bossNum1, bossNum1.Position + new Vector2(bossNum1.Width / 2 - 25, bossNum1.Height - 25), 50, 50, 10),
+                new Shooter(player, bossNum1, bossNum1.Position + new Vector2(bossNum1.Width - 25, bossNum1.Height - 25), 50, 50, 10)
+            }, new List<Missile>()));
+            bossStages.Add(new Stage(GetEnemiesInCircle<Dasher>(player, 3, 75, 75, 5), new List<Missile>()));
             bossStages.Add(new Stage(new List<Enemy>
             {
                 new Shooter(player, bossNum1, bossNum1.Position + new Vector2(-25, bossNum1.Height - 25), 50, 50, 10),

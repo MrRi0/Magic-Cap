@@ -1,4 +1,5 @@
 using GameWinForm.Controller;
+using GameWinForm.Core;
 using GameWinForm.Model;
 using System.Windows.Forms;
 
@@ -10,11 +11,13 @@ namespace GameWinForm.View
         private readonly InputController _inputController;
         private readonly MouseController _mouseController;
         private readonly GameView _gameView;
-        private readonly LevelSelectForm _levelSelectForm;
+        private readonly MenuForm _menuForm;
+        private readonly PauseForm _pauseForm;
 
-        public MainForm(LevelSelectForm levelSelectForm)
+        public MainForm(MenuForm menuForm)
         {
-            _levelSelectForm = levelSelectForm;
+            _menuForm = menuForm;
+
             _model = new GameModel();
             _inputController = new InputController(_model);
             _mouseController = new MouseController(_model);
@@ -22,8 +25,9 @@ namespace GameWinForm.View
             {
                 Dock = DockStyle.Fill
             };
-
+            _pauseForm = new PauseForm(_gameView, this);
             Controls.Add(_gameView);
+            Controls.Add(_pauseForm);
 
             _gameView.MouseDown += OnMouseDown;
             _gameView.MouseUp += OnMouseUp;
@@ -33,7 +37,9 @@ namespace GameWinForm.View
             WindowState = FormWindowState.Maximized;
             FormBorderStyle = FormBorderStyle.FixedDialog;
             MaximizeBox = false;
-            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
+            FormBorderStyle = FormBorderStyle.None;
+            DoubleBuffered = true;
+            SetStyle(ControlStyles.OptimizedDoubleBuffer, true);
         }
 
         private void OnMouseDown(object sender, MouseEventArgs e)
@@ -51,11 +57,16 @@ namespace GameWinForm.View
             _mouseController.HandleMouseMove(e);
         }
 
+        public void BackToMenu()
+        {
+            this.SwitchForms(_menuForm);
+        }
+
         protected override void OnKeyDown(KeyEventArgs e)
         {
             _inputController.HandleKeyDown(e.KeyCode);
             if (e.KeyCode == Keys.Escape)
-                _gameView.PauseGame();
+                _gameView.PauseGame(_pauseForm);
             base.OnKeyDown(e);
         }
 
@@ -64,6 +75,8 @@ namespace GameWinForm.View
             _inputController.HandleKeyUp(e.KeyCode);
             base.OnKeyUp(e);
         }
+
+
     }
 }
 

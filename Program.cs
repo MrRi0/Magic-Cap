@@ -1,5 +1,6 @@
 using GameWinForm.Controller;
 using GameWinForm.View;
+using System.Runtime.CompilerServices;
 
 namespace GameWinForm
 {
@@ -10,7 +11,8 @@ namespace GameWinForm
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new MenuForm());
+            var startForm = new MenuForm();
+            Application.Run(startForm);
         }
     }
 }
