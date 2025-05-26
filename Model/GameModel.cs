@@ -19,6 +19,8 @@ namespace GameWinForm.Model
         public Boss Boss { get; private set; }
         public Level Level { get; private set; }
         public bool IsPause { get; set; }
+        public bool IsSelectUpgrade { get; set; }
+        public Upgrades[] RandomUpgrades { get; private set; }
 
         public List<Missile> BulletHellStage { get; private set; }
 
@@ -68,7 +70,10 @@ namespace GameWinForm.Model
                 _bossStageTimer.Start();
             }
             else if (_stage.IsEmpty())
+            {
+                RandomUpgrades = GetRandomUpgrades();
                 _stageTimer.Start();
+            }
         }
 
         private void GoNextStage(object sender, EventArgs e)
@@ -99,6 +104,24 @@ namespace GameWinForm.Model
         private void BossFightUpdate()
         {
             Boss.Update();
+        }
+
+        private Upgrades[] GetRandomUpgrades()
+        {
+            IsSelectUpgrade = true;
+            var rnd = new Random();
+            var result = new Upgrades[3];
+            for (int i = 0; i < 3; i++)
+            {
+                var randomUpgrade = (Upgrades)rnd.Next(7);
+                if (!Player.SelectedUpgrades.TryGetValue(randomUpgrade, out int count))
+                    result[i] = randomUpgrade;
+                else if (count < 3)
+                    result[i] = randomUpgrade;
+                else
+                    result[i] = Player.SelectedUpgrades.MinBy(x => x.Value).Key;
+            }
+            return result;
         }
 
         private void CheckBulletHellCollisions()

@@ -12,19 +12,25 @@ namespace GameWinForm.Model
     public class Player : Entity
     {
         public Vector2 LastMoveDirection { get; set; }
-        public int DashCoolDown { get; private set; }
+        public int SkillCoolDown { get; private set; }
+        public bool IsShield { get; private set; }
+        public Dictionary<Upgrades, int> SelectedUpgrades { get; private set; }
+        public Action<Vector2> CurrentSkill { get; private set; }
 
         public event Action<Vector2> PositionChanged;
 
-        private int _dashCoolDownTime = 2000;
+        private int _skillCoolDownTime;
         private int _attackCoolDownTime = 250;
         private bool _attackIsReady;
-        private Timer _dashRechargeTimer = new Timer { Interval = 20 };
+        private int _damage = 1;
+        private Timer _skillRechargeTimer = new Timer { Interval = 20 };
         private Timer _attackRechargeTimer = new Timer();
+        private float _dashSpeed = 100f;
+        private Timer _shieldTimer = new Timer();
+        private int _shieldDuration = 600;
 
         private const float _drag = 0.9f;
-        private const float _acceleration = 6f;
-        private const float _dashSpeed = 100f;
+        private float _acceleration = 6f;
 
         private readonly int _windowHeight = Screen.PrimaryScreen.Bounds.Height;
         private readonly int _windowWidth = Screen.PrimaryScreen.Bounds.Width;
@@ -32,15 +38,14 @@ namespace GameWinForm.Model
         public Player()
         {
             Missiles = new List<Missile>();
-            Hp = 5;
+            HP = 5;
             Width = 90;
             Height = 140;
-            DashCoolDown = _dashCoolDownTime;
             Position = new Vector2((_windowWidth - Width) / 2, (_windowHeight - Height) / 2);
             _attackIsReady = true;
-            _dashRechargeTimer.Tick += RechargeDash;
             _attackRechargeTimer.Interval = _attackCoolDownTime;
             _attackRechargeTimer.Tick += RechargeAttack;
+            SelectedUpgrades = new Dictionary<Upgrades, int>();
         }
 
         public void Update()
@@ -68,13 +73,84 @@ namespace GameWinForm.Model
             Velocity = new Vector2(direction.X, direction.Y).Normalize() * _acceleration;
         }
 
-        public void Dash(Vector2 direction)
+        public void UseSkill(Vector2 direction)
         {
-            if (DashCoolDown >= _dashCoolDownTime)
+            CurrentSkill(direction);
+        }
+
+        public void SetSkill(Skills skill)
+        {
+            switch (skill)
+            {
+                case Skills.Dash:
+                    _skillCoolDownTime = 2000;
+                    CurrentSkill = Dash;
+                    break;
+
+                case Skills.Shield:
+                    _skillCoolDownTime = 2500;
+                    CurrentSkill = Shield;
+                    _shieldTimer.Tick += UseShield;
+                    break;
+            }
+            SkillCoolDown = _skillCoolDownTime;
+            _skillRechargeTimer.Tick += RechargeSkill;
+        }
+
+        public void UpgradePlayer(Upgrades upgrade)
+        {
+            if (!SelectedUpgrades.TryAdd(upgrade, 0))
+                SelectedUpgrades[upgrade] += 1;
+            switch (upgrade)
+            {
+                case Upgrades.HP:
+                    HP += 1;
+                    break;
+
+                case Upgrades.AttackSpeed:
+                    _attackCoolDownTime -= 20;
+                    break;
+
+                case Upgrades.Speed:
+                    _acceleration += 1;
+                    break;
+
+                case Upgrades.ShieldDuration:
+                    _shieldDuration += 100;
+                    break;
+
+                case Upgrades.DashSpeed:
+                    _dashSpeed += 20;
+                    break;
+
+                case Upgrades.Damage:
+                    _damage += 1;
+                    break;
+
+                case Upgrades.SkillCoolDown:
+                    _skillCoolDownTime -= _skillCoolDownTime / 10;
+                    break;
+            }
+        }
+
+        private void Dash(Vector2 direction)
+        {
+            if (SkillCoolDown >= _skillCoolDownTime)
             {
                 Position += new Vector2(direction.X, direction.Y).Normalize() * _dashSpeed;
-                DashCoolDown = 0;
-                _dashRechargeTimer.Start();
+                SkillCoolDown = 0;
+                _skillRechargeTimer.Start();
+            }
+        }
+
+        private void Shield(Vector2 _)
+        {
+            if (SkillCoolDown >= _skillCoolDownTime)
+            {
+                IsInvulnerability = true;
+                IsShield = true;
+                _shieldTimer.Interval = _shieldDuration;
+                _shieldTimer.Start();
             }
         }
 
@@ -82,17 +158,26 @@ namespace GameWinForm.Model
         {
             if (_attackIsReady)
             { 
-                Missiles.Add(new Missile(this, targetPosition, 1));
+                Missiles.Add(new Missile(this, targetPosition, _damage));
                 _attackIsReady = false;
                 _attackRechargeTimer.Start();
             }
         }
 
-        private void RechargeDash(object sender, EventArgs e)
+        private void RechargeSkill(object sender, EventArgs e)
         {
-            DashCoolDown += _dashCoolDownTime / _dashRechargeTimer.Interval;
-            if (DashCoolDown >= _dashCoolDownTime)
-                _dashRechargeTimer.Stop();
+            SkillCoolDown += _skillCoolDownTime / _skillRechargeTimer.Interval;
+            if (SkillCoolDown >= _skillCoolDownTime)
+                _skillRechargeTimer.Stop();
+        }
+
+        private void UseShield(object sender, EventArgs e)
+        {
+            IsInvulnerability = false;
+            IsShield = false;
+            SkillCoolDown = 0;
+            _skillRechargeTimer.Start();
+            _shieldTimer.Stop();
         }
 
         private void RechargeAttack(object sender, EventArgs e)

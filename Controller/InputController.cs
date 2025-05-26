@@ -39,9 +39,9 @@ namespace GameWinForm.Controller
             if (_keyStates.GetValueOrDefault(Keys.D, false)) moveDirection.X += 1;
             if (_keyStates.GetValueOrDefault(Keys.W, false)) moveDirection.Y -= 1;
             if (_keyStates.GetValueOrDefault(Keys.S, false)) moveDirection.Y += 1;
-            if (_keyStates.GetValueOrDefault(Keys.Space, false)) _model.Player.Dash(moveDirection);
+            if (_keyStates.GetValueOrDefault(Keys.Space, false) && _model.Player.CurrentSkill != null) _model.Player.UseSkill(moveDirection);
 
-                _model.Player.LastMoveDirection = moveDirection;
+            _model.Player.LastMoveDirection = moveDirection;
             if (moveDirection != Vector2.Zero)
                 _model.Player.Move(moveDirection);
         }

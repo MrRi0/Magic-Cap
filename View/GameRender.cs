@@ -63,12 +63,12 @@ namespace GameWinForm.View
                     _playerSprite.Height);
                 DrawPlayerMissile(graphics);
 
-                for (int i = 0; i < player.Hp; i++)
+                for (int i = 0; i < player.HP; i++)
                     graphics.DrawImage(_heartSprite, new Point(20 + _heartSprite.Width * 3 / 2 * i, 20));
 
                 graphics.DrawRectangle(new Pen(Color.Red), 20, 20 + _heartSprite.Height + 10, 200, 31);
                 graphics.DrawLine(new Pen(Color.Cyan, 30), 21, 20 + _heartSprite.Height + 10 + 15 + 1,
-                    20 + player.DashCoolDown / 10, 20 + _heartSprite.Height + 10 + 15 + 1);
+                    20 + player.SkillCoolDown / 10, 20 + _heartSprite.Height + 10 + 15 + 1);
             }
         }
 

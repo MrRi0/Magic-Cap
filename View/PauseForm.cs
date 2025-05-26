@@ -66,10 +66,9 @@ namespace GameWinForm.View
         }
 
         private void ContinueButtonClick(object sender, EventArgs e) => _gameView.PauseGame(this);
-        private void SettingsButtonClick(object sender, EventArgs e)
-        {
 
-        }
+        private void SettingsButtonClick(object sender, EventArgs e)
+        { }
 
         private void ExitMenuButtonClick(object sender, EventArgs e) => _mainForm.BackToMenu();
     }

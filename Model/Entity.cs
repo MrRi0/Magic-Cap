@@ -11,7 +11,7 @@ namespace GameWinForm.Model
 {
     public class Entity
     {
-        public int Hp { get; protected set; }
+        public int HP { get; protected set; }
         public int Width { get; protected set; }
         public int Height { get; protected set; }
         public Vector2 Position { get; protected set; }
@@ -30,7 +30,7 @@ namespace GameWinForm.Model
         {
             if (!IsInvulnerability)
             { 
-                Hp -= damage;
+                HP -= damage;
                 IsInvulnerability = true;
                 _framesInvulnerability.Start();
             }
@@ -38,7 +38,7 @@ namespace GameWinForm.Model
 
         public bool IsDeath()
         {
-            return Hp <= 0;
+            return HP <= 0;
         }
 
         public Vector2 GetCenterPosition()

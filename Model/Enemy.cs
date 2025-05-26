@@ -39,7 +39,7 @@ namespace GameWinForm.Model
         public Enemy(Player player, Vector2 position, Vector2[] trajectory, int width, int height, int hp)
         {
             Missiles = new List<Missile>();
-            Hp = hp;
+            HP = hp;
             Position = position;
             Width = width;
             Height = height;
@@ -52,7 +52,7 @@ namespace GameWinForm.Model
         public Enemy(Player player, Boss boss, Vector2 position, int width, int height, int hp)
         {
             Missiles = new List<Missile>();
-            Hp = hp;
+            HP = hp;
             Position = position;
             Width = width;
             Height = height;
@@ -105,7 +105,7 @@ namespace GameWinForm.Model
 
         public new void TakeDamage(int damage)
         {
-            Hp -= damage;
+            HP -= damage;
         }
 
         protected void MoveOnTrajectory(object sender, EventArgs e)

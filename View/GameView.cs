@@ -14,6 +14,7 @@ namespace GameWinForm.View
     {
         public bool IsPause { get; private set; }
         private readonly GameModel _model;
+        private UprgadeSelectForm _uprgadeSelectForm;
         private readonly System.Windows.Forms.Timer _gameLoop;
         public GameView(GameModel model)
         {
@@ -46,6 +47,14 @@ namespace GameWinForm.View
         private void GameLoop_Tick(object sender, EventArgs e)
         {
             _model.Update();
+            if (_model.IsSelectUpgrade)
+            { 
+                _uprgadeSelectForm = new UprgadeSelectForm(_model);
+                Controls.Add(_uprgadeSelectForm);
+                _gameLoop.Stop();
+                _uprgadeSelectForm.BringToFront();
+                _uprgadeSelectForm.Show();
+            }
             Invalidate();
         }
 
