@@ -8,6 +8,7 @@ namespace GameWinForm.Model
 {
     public enum Skills
     { 
+        NoSkill,
         Dash,
         Shield,
         Teleportation

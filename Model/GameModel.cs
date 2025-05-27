@@ -2,6 +2,8 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Data;
+using System.Diagnostics.Eventing.Reader;
 using System.Linq;
 using System.Net.WebSockets;
 using System.Numerics;
@@ -21,12 +23,13 @@ namespace GameWinForm.Model
         public bool IsPause { get; set; }
         public bool IsSelectUpgrade { get; set; }
         public Upgrades[] RandomUpgrades { get; private set; }
+        public Skills[] RandomSkills { get; private set; }
 
         public List<Missile> BulletHellStage { get; private set; }
 
         private Stage _stage;
         private BossStage _bossFight;
-        private Timer _stageTimer = new Timer { Interval = 1400 };
+        //private Timer _stageTimer = new Timer { Interval = 1400 };
         private Timer _bossStageTimer = new Timer { Interval = 800 };
 
         public GameModel()
@@ -36,7 +39,7 @@ namespace GameWinForm.Model
             _stage = Level.GetNextStage();
             Enemies = _stage.Enemies;
             BulletHellStage = _stage.Missiles;
-            _stageTimer.Tick += GoNextStage;
+            //_stageTimer.Tick += GoNextStage;
             _bossStageTimer.Tick += GoNextStage;
             IsPause = false;
         }
@@ -71,8 +74,10 @@ namespace GameWinForm.Model
             }
             else if (_stage.IsEmpty())
             {
-                RandomUpgrades = GetRandomUpgrades();
-                _stageTimer.Start();
+                if (Level.CurrentStageNumber == 3)
+                    RandomSkills = GetRandomSkills();
+                else
+                    RandomUpgrades = GetRandomUpgrades();
             }
         }
 
@@ -97,8 +102,22 @@ namespace GameWinForm.Model
                 Enemies = _stage.Enemies.ToList();
                 BulletHellStage = _stage.Missiles.ToList();
             }
-            _stageTimer.Stop();
+            //_stageTimer.Stop();
             _bossStageTimer.Stop();
+        }
+
+        public void UpgradePlayer(Upgrades upgrade)
+        {
+            Player.UpgradePlayer(upgrade);
+            IsSelectUpgrade = false;
+            GoNextStage(1, EventArgs.Empty);
+        }
+
+        public void SetPlayerSkill(Skills skill)
+        {
+            Player.SetSkill(skill);
+            IsSelectUpgrade = false;
+            GoNextStage(1, EventArgs.Empty);
         }
 
         private void BossFightUpdate()
@@ -109,17 +128,47 @@ namespace GameWinForm.Model
         private Upgrades[] GetRandomUpgrades()
         {
             IsSelectUpgrade = true;
+            RandomSkills = Array.Empty<Skills>();
             var rnd = new Random();
+            var posibleUpgrades = new List<Upgrades>();
+            foreach (var (upgrade, count) in Player.SelectedUpgrades)
+            {
+                if ((upgrade == Upgrades.DashSpeed || upgrade == Upgrades.ShieldDuration || upgrade == Upgrades.SkillCoolDown)
+                    && Player.CurrentSkill == Skills.NoSkill)
+                    continue;
+
+                else if (upgrade == Upgrades.DashSpeed && Player.CurrentSkill == Skills.Dash && count < 3)
+                    posibleUpgrades.Add(upgrade);
+
+                else if (upgrade == Upgrades.ShieldDuration && Player.CurrentSkill == Skills.Shield && count < 3)
+                    posibleUpgrades.Add(upgrade);
+
+                else if (count < 3 && upgrade != Upgrades.DashSpeed && upgrade != Upgrades.ShieldDuration)
+                    posibleUpgrades.Add(upgrade);
+            }
             var result = new Upgrades[3];
             for (int i = 0; i < 3; i++)
             {
-                var randomUpgrade = (Upgrades)rnd.Next(7);
-                if (!Player.SelectedUpgrades.TryGetValue(randomUpgrade, out int count))
-                    result[i] = randomUpgrade;
-                else if (count < 3)
-                    result[i] = randomUpgrade;
+                var randomIndex = rnd.Next(posibleUpgrades.Count);
+                if (Player.SelectedUpgrades[posibleUpgrades[randomIndex]] < 3)
+                    result[i] = posibleUpgrades[randomIndex];
                 else
-                    result[i] = Player.SelectedUpgrades.MinBy(x => x.Value).Key;
+                    result[i] = Player.SelectedUpgrades.Where(x => x.Value > 0).MinBy(x => x.Value).Key;
+            }
+            return result;
+        }
+
+        private Skills[] GetRandomSkills()
+        {
+            IsSelectUpgrade = true;
+            RandomUpgrades = Array.Empty<Upgrades>();
+            var rnd = new Random();
+            var posibleSkills = Enum.GetValues(typeof(Skills)).Cast<Skills>().ToArray();
+            var result = new Skills[3];
+            for (int i = 0; i < 3; i++)
+            {
+                var randomIndex = rnd.Next(posibleSkills.Length);
+                result[i] = posibleSkills[randomIndex];
             }
             return result;
         }

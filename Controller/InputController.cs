@@ -21,14 +21,13 @@ namespace GameWinForm.Controller
         public void HandleKeyDown(Keys key)
         {
             _keyStates[key] = true;
-            if (!_model.IsPause)
+            if (!_model.IsPause && !_model.IsSelectUpgrade)
                 ProcessInput();
         }
 
         public void HandleKeyUp(Keys key)
         {
             _keyStates[key] = false;
-            if (!_model.IsPause)
                 ProcessInput();
         }
 
@@ -39,7 +38,8 @@ namespace GameWinForm.Controller
             if (_keyStates.GetValueOrDefault(Keys.D, false)) moveDirection.X += 1;
             if (_keyStates.GetValueOrDefault(Keys.W, false)) moveDirection.Y -= 1;
             if (_keyStates.GetValueOrDefault(Keys.S, false)) moveDirection.Y += 1;
-            if (_keyStates.GetValueOrDefault(Keys.Space, false) && _model.Player.CurrentSkill != null) _model.Player.UseSkill(moveDirection);
+            if (_keyStates.GetValueOrDefault(Keys.Space, false) && _model.Player.CurrentSkill != Skills.NoSkill)
+                _model.Player.UseSkill(moveDirection);
 
             _model.Player.LastMoveDirection = moveDirection;
             if (moveDirection != Vector2.Zero)

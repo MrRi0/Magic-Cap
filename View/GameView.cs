@@ -12,9 +12,11 @@ namespace GameWinForm.View
 {
     public class GameView : UserControl
     {
-        public bool IsPause { get; private set; }
+        //public bool IsPause { get; private set; }
+        private bool IsPause;
+        private bool IsSelectSkill;
         private readonly GameModel _model;
-        private UprgadeSelectForm _uprgadeSelectForm;
+        private SelectSkillForm _uprgadeSelectForm;
         private readonly System.Windows.Forms.Timer _gameLoop;
         public GameView(GameModel model)
         {
@@ -44,16 +46,31 @@ namespace GameWinForm.View
             }
         }
 
-        private void GameLoop_Tick(object sender, EventArgs e)
+        public void UpdateSelectSkillForm()
         {
-            _model.Update();
-            if (_model.IsSelectUpgrade)
-            { 
-                _uprgadeSelectForm = new UprgadeSelectForm(_model);
+            IsSelectSkill = !IsSelectSkill;
+            if (IsSelectSkill)
+            {            
+                _uprgadeSelectForm = new SelectSkillForm(_model, this);
                 Controls.Add(_uprgadeSelectForm);
                 _gameLoop.Stop();
                 _uprgadeSelectForm.BringToFront();
                 _uprgadeSelectForm.Show();
+            }
+            else
+            {
+                _gameLoop.Start();
+                _uprgadeSelectForm.Dispose();
+            }
+
+        }
+
+        private void GameLoop_Tick(object sender, EventArgs e)
+        {
+            _model.Update();
+            if (_model.IsSelectUpgrade)
+            {
+                UpdateSelectSkillForm();
             }
             Invalidate();
         }

@@ -69,6 +69,13 @@ namespace GameWinForm.View
                 graphics.DrawRectangle(new Pen(Color.Red), 20, 20 + _heartSprite.Height + 10, 200, 31);
                 graphics.DrawLine(new Pen(Color.Cyan, 30), 21, 20 + _heartSprite.Height + 10 + 15 + 1,
                     20 + player.SkillCoolDown / 10, 20 + _heartSprite.Height + 10 + 15 + 1);
+
+                if (player.IsShield)
+                    graphics.DrawEllipse(new Pen(Color.Cyan), 
+                        player.GetCenterPosition().X - player.Height * 3 / 4, 
+                        player.GetCenterPosition().Y - player.Height * 3 / 4, 
+                        player.Height * 3 / 2, 
+                        player.Height * 3 / 2);
             }
         }
 

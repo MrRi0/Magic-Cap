@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.Numerics;
 using GameWinForm.Core;
 using Timer = System.Windows.Forms.Timer;
+using System.Security.Cryptography;
 
 namespace GameWinForm.Model
 {
@@ -15,7 +16,7 @@ namespace GameWinForm.Model
         public int SkillCoolDown { get; private set; }
         public bool IsShield { get; private set; }
         public Dictionary<Upgrades, int> SelectedUpgrades { get; private set; }
-        public Action<Vector2> CurrentSkill { get; private set; }
+        public Skills CurrentSkill { get; private set; }
 
         public event Action<Vector2> PositionChanged;
 
@@ -42,10 +43,11 @@ namespace GameWinForm.Model
             Width = 90;
             Height = 140;
             Position = new Vector2((_windowWidth - Width) / 2, (_windowHeight - Height) / 2);
+            CurrentSkill = Skills.NoSkill;
             _attackIsReady = true;
             _attackRechargeTimer.Interval = _attackCoolDownTime;
             _attackRechargeTimer.Tick += RechargeAttack;
-            SelectedUpgrades = new Dictionary<Upgrades, int>();
+            SelectedUpgrades = Enum.GetValues(typeof(Upgrades)).Cast<Upgrades>().ToDictionary(x => x, y => 0);
         }
 
         public void Update()
@@ -75,7 +77,16 @@ namespace GameWinForm.Model
 
         public void UseSkill(Vector2 direction)
         {
-            CurrentSkill(direction);
+            switch (CurrentSkill)
+            {
+                case Skills.Dash:
+                    Dash(direction);
+                    break;
+
+                case Skills.Shield:
+                    Shield();
+                    break;
+            }
         }
 
         public void SetSkill(Skills skill)
@@ -84,12 +95,12 @@ namespace GameWinForm.Model
             {
                 case Skills.Dash:
                     _skillCoolDownTime = 2000;
-                    CurrentSkill = Dash;
+                    CurrentSkill = Skills.Dash;
                     break;
 
                 case Skills.Shield:
                     _skillCoolDownTime = 2500;
-                    CurrentSkill = Shield;
+                    CurrentSkill = Skills.Shield;
                     _shieldTimer.Tick += UseShield;
                     break;
             }
@@ -99,8 +110,7 @@ namespace GameWinForm.Model
 
         public void UpgradePlayer(Upgrades upgrade)
         {
-            if (!SelectedUpgrades.TryAdd(upgrade, 0))
-                SelectedUpgrades[upgrade] += 1;
+            SelectedUpgrades[upgrade] += 1;
             switch (upgrade)
             {
                 case Upgrades.HP:
@@ -143,7 +153,7 @@ namespace GameWinForm.Model
             }
         }
 
-        private void Shield(Vector2 _)
+        private void Shield()
         {
             if (SkillCoolDown >= _skillCoolDownTime)
             {

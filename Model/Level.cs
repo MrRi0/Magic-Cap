@@ -9,6 +9,7 @@ namespace GameWinForm.Model
     public class Level
     {
         public readonly int Number;
+        public int CurrentStageNumber { get; private set; }
         private Queue<Stage> _stages;
         private BossStage _bossStage;
 
@@ -21,6 +22,7 @@ namespace GameWinForm.Model
 
         public Stage GetNextStage()
         {
+            CurrentStageNumber += 1;
             if (_stages.Count != 0)
                 return _stages.Dequeue();
             return Stage.Empty;
