@@ -34,6 +34,9 @@ namespace GameWinForm.View
             Name = "WinnerForm";
             Text = "YouWin";
 
+            BackgroundImage = GetSprite("winnerBg.png");
+            BackgroundImageLayout = ImageLayout.Stretch;
+
             _indentHorizontal = (Size.Width - _buttonSize.Width) / 2;
             _indentVertical = 300;
 
@@ -54,5 +57,15 @@ namespace GameWinForm.View
         }
 
         private void ExitMenuButtonClick(object sender, EventArgs e) => _mainForm.BackToMenu();
+
+        private static Bitmap GetSprite(string fileName)
+        {
+            var fullPath = Path.Combine(
+                Directory.GetParent(Environment.CurrentDirectory).Parent.Parent.FullName,
+                "View", "Image", fileName
+            );
+            var result = new Bitmap(fullPath);
+            return result;
+        }
     }
 }

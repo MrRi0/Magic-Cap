@@ -33,5 +33,11 @@ namespace GameWinForm.Model
                 _targetPosition = Position + new Vector2(0, -Height);
             _isBorn = false;
         }
+
+        public override void TakeDamage(int damage)
+        {
+            if (_isBorn)
+                HP -= damage;
+        }
     }
 }

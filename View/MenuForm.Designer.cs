@@ -28,6 +28,8 @@
             _playButton = new Button();
             _settingsButton = new Button();
             _exitButton = new Button();
+            BackgroundImage = GetSprite("screensaver.png");
+            BackgroundImageLayout = ImageLayout.Stretch;
             SuspendLayout();
 
             InitializePlayButton();
@@ -72,13 +74,23 @@
 
         private void InitializePlayButton()
         {
-            _playButton.Location = new Point((_windowWidth - _bigButtonSize.Width) / 2, (_windowHeight - _bigButtonSize.Height) / 2);
+            _playButton.Location = new Point((_windowWidth - _bigButtonSize.Width) / 2, (_windowHeight - _bigButtonSize.Height) / 2 + 100);
             _playButton.Name = "playButton";
             _playButton.Size = _bigButtonSize;
             _playButton.TabIndex = 0;
             _playButton.Text = "Играть";
             _playButton.UseVisualStyleBackColor = true;
             _playButton.Click += PlayButtonClick;
+        }
+
+        private static Bitmap GetSprite(string fileName)
+        {
+            var fullPath = Path.Combine(
+                Directory.GetParent(Environment.CurrentDirectory).Parent.Parent.FullName,
+                "View", "Image", fileName
+            );
+            var result = new Bitmap(fullPath);
+            return result;
         }
     }
 }

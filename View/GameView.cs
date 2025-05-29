@@ -12,6 +12,8 @@ namespace GameWinForm.View
 {
     public class GameView : UserControl
     {
+        //private Bitmap _optimizedBackground;
+        private Brush _backgroundBrush;
         private bool IsPause;
         private bool IsSelectSkill;
         private SelectSkillForm _uprgadeSelectForm;
@@ -44,6 +46,16 @@ namespace GameWinForm.View
             _gameLoop = new System.Windows.Forms.Timer { Interval = 16 };
             _gameLoop.Tick += GameLoop_Tick;
             _gameLoop.Start();
+
+            //var original = GetSprite("mainBackground.png");
+            //_optimizedBackground = new Bitmap(original, this.ClientSize); // Масштабирование 1 раз
+            //original.Dispose();
+
+            var bgImage = GetSprite("mainBackground.png");
+            _backgroundBrush = new TextureBrush(bgImage); // Создаем кисть
+            bgImage.Dispose();
+
+            SetStyle(ControlStyles.OptimizedDoubleBuffer, true);
         }
 
         public void PauseGame()
@@ -109,10 +121,21 @@ namespace GameWinForm.View
             Invalidate();
         }
 
+        private static Bitmap GetSprite(string fileName)
+        {
+            var fullPath = Path.Combine(
+                Directory.GetParent(Environment.CurrentDirectory).Parent.Parent.FullName,
+                "View", "Image", fileName
+            );
+            var result = new Bitmap(fullPath);
+            return result;
+        }
+
         protected override void OnPaint(PaintEventArgs e)
         {
             base.OnPaint(e);
 
+            e.Graphics.FillRectangle(_backgroundBrush, this.ClientRectangle);
             e.Graphics.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.None;
             e.Graphics.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.NearestNeighbor;
             e.Graphics.PixelOffsetMode = System.Drawing.Drawing2D.PixelOffsetMode.Half;

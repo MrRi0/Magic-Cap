@@ -38,6 +38,7 @@ namespace GameWinForm.View
             MaximizeBox = false;
             FormBorderStyle = FormBorderStyle.None;
             DoubleBuffered = true;
+
             SetStyle(ControlStyles.OptimizedDoubleBuffer, true);
         }
 

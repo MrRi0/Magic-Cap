@@ -14,7 +14,7 @@ namespace GameWinForm.View
         private Button _settingsButton;
         private Button _exitMenuButton;
 
-        private Size _buttonSize = new Size(200, 75);
+        private Size _buttonSize = new Size(200, 60);
         private int _indentVertical;
         private int _indentHorizontal;
 
@@ -38,7 +38,10 @@ namespace GameWinForm.View
             Name = "PauseForm";
             Text = "Pause";
 
-            _indentVertical = ((Size.Height - 150) - _buttonSize.Height * 3) / 4;
+            BackgroundImage = GetSprite("pausebg.png");
+            BackgroundImageLayout = ImageLayout.Stretch;
+
+            _indentVertical = ((Size.Height - 150) - _buttonSize.Height * 3) / 4 - 20;
             _indentHorizontal = (Size.Width - _buttonSize.Width) / 2;
 
             _continueButton = new Button();
@@ -46,7 +49,7 @@ namespace GameWinForm.View
             _exitMenuButton = new Button();
 
             InitializeButton(_continueButton, "_continueButton", "Продолжить",
-                new Point(_indentHorizontal, 100 + _indentHorizontal), ContinueButtonClick);
+                new Point(_indentHorizontal, 120 + _indentHorizontal), ContinueButtonClick);
             InitializeButton(_settingsButton, "_settingsButton", "Настройки",
                 new Point(_indentHorizontal, _continueButton.Location.Y + _buttonSize.Height + _indentVertical), SettingsButtonClick);
             InitializeButton(_exitMenuButton, "_exitButton", "Выйти в меню",
@@ -71,5 +74,15 @@ namespace GameWinForm.View
         { }
 
         private void ExitMenuButtonClick(object sender, EventArgs e) => _mainForm.BackToMenu();
+
+        private static Bitmap GetSprite(string fileName)
+        {
+            var fullPath = Path.Combine(
+                Directory.GetParent(Environment.CurrentDirectory).Parent.Parent.FullName,
+                "View", "Image", fileName
+            );
+            var result = new Bitmap(fullPath);
+            return result;
+        }
     }
 }

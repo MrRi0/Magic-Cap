@@ -41,10 +41,11 @@ namespace GameWinForm.View
         private const int MoveAnimationSpeed = 6;
         private const int StayAnimationSpeed = 12;
 
-        private Color attackColor = Color.FromArgb(150, Color.Red);
+        private Color attackColor = Color.FromArgb(200, Color.Red);
 
         public GameRender(GameModel model)
-        {
+        { 
+
             _playerStayLeftSpriteSheet = GetSprite("SpriteSheetStayLeft.png");
             _playerStayRightSpriteSheet = GetSprite("SpriteSheetStayRight.png");
             _playerMoveLeftSpriteSheet = GetSprite("MoveLeftSpriteSheet.png");
@@ -183,7 +184,7 @@ namespace GameWinForm.View
                     _shooterAnimation.Draw(graphics, (int)enemy.Position.X, (int)enemy.Position.Y);
                     if (((Shooter)enemy).AttackTrajectory != Vector2.Zero)
                     {
-                        graphics.DrawLine(new Pen(attackColor),
+                        graphics.DrawLine(new Pen(attackColor, 2),
                             shooter.GetCenterPosition().X,
                             shooter.GetCenterPosition().Y,
                             shooter.AttackTrajectory.X,
@@ -234,7 +235,7 @@ namespace GameWinForm.View
             foreach (var missile in _model.BulletHellStage)
             {
                 if (missile.AttackTrajectory != Vector2.Zero)
-                    graphics.DrawLine(new Pen(attackColor),
+                    graphics.DrawLine(new Pen(attackColor, 2),
                         missile.GetCenterPosition().X,
                         missile.GetCenterPosition().Y,
                         missile.AttackTrajectory.X,

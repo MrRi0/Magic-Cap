@@ -99,7 +99,7 @@ namespace GameWinForm.Model
         private static Level CreateLevelNum1(Player player)
         {
             var stagesNum1 = new Queue<Stage>();
-            stagesNum1.Enqueue(new Stage(new List<Enemy> { new Enemy(player, new Vector2(_windowWidth / 2, _windowHeight / 2), new[] { new Vector2(_windowWidth / 4, _windowHeight / 2) }, 10) }, new List<Missile>()));
+            stagesNum1.Enqueue(new Stage(new List<Enemy> { new Enemy(player, new Vector2(-100, _windowHeight / 2), new[] { new Vector2(_windowWidth / 4, _windowHeight / 2) }, 10) }, new List<Missile>()));
             stagesNum1.Enqueue(new Stage(new List<Enemy>(), new List<Missile> { new Missile(new Vector2(-20, _windowHeight / 2), new Vector2(_windowWidth, _windowHeight / 2), 1) }));
             stagesNum1.Enqueue(new Stage(GetEnemiesInCircle<Enemy>(player, 4, EnemySize, EnemySize, 5), new List<Missile>()));
             stagesNum1.Enqueue(new Stage(new List<Enemy> { new Shooter(player, new Vector2(-100, _windowHeight / 2), new[] { new Vector2(_windowWidth / 4, _windowHeight / 2) }, 10) }, new List<Missile>()));
@@ -112,7 +112,7 @@ namespace GameWinForm.Model
             stagesNum1.Enqueue(new Stage(GetEnemiesInCircle<Dasher>(player, 2, EnemySize, EnemySize, 14), new List<Missile>()));
             stagesNum1.Enqueue(new Stage(GetEnemiesInCircle<Shooter>(player, 6, EnemySize, EnemySize, 12), new List<Missile>()));
 
-            var bossNum1 = new Boss(player, new Vector2(_windowWidth / 4, -200), new[] { new Vector2(_windowWidth / 4, 0) }, 75);
+            var bossNum1 = new Boss(player, new Vector2(_windowWidth / 4, -200), new[] { new Vector2(_windowWidth / 4, 0) }, 100);
             var bossStages = new List<Stage>();
             bossStages.Add(GetBossWithGunsStage(player, bossNum1, EnemySize));
             bossStages.Add(new Stage(new List<Enemy>(), GetGridBulletHellStage(2, 2)));

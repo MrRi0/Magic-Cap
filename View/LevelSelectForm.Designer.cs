@@ -24,6 +24,8 @@ namespace GameWinForm.View
 
         private void InitializeComponent()
         {
+            BackgroundImage = GetSprite("levelselectbg.png");
+            BackgroundImageLayout = ImageLayout.Stretch;
             InitializeBackButton();
 
             _indentVertical = (_windowHeight / 3 * 2 - _buttonSize.Height * 2) / 3;
@@ -82,6 +84,16 @@ namespace GameWinForm.View
                 Controls.Add(level);
                 level.Click += LevelButtonNum1Click;
             }
+        }
+
+        private static Bitmap GetSprite(string fileName)
+        {
+            var fullPath = Path.Combine(
+                Directory.GetParent(Environment.CurrentDirectory).Parent.Parent.FullName,
+                "View", "Image", fileName
+            );
+            var result = new Bitmap(fullPath);
+            return result;
         }
     }
 }

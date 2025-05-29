@@ -103,7 +103,7 @@ namespace GameWinForm.Model
             Velocity = (_targetPosition - Position).Normalize() * _speed;
         }
 
-        public new void TakeDamage(int damage)
+        public new virtual void TakeDamage(int damage)
         {
             HP -= damage;
         }
