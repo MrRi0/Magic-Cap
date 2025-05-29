@@ -15,6 +15,7 @@ namespace GameWinForm.Model
         public Vector2 LastMoveDirection { get; set; }
         public int SkillCoolDown { get; private set; }
         public bool IsShield { get; private set; }
+        public bool IsDash { get; private set; }
         public Dictionary<Upgrades, int> SelectedUpgrades { get; private set; }
         public Skills CurrentSkill { get; private set; }
 
@@ -26,8 +27,9 @@ namespace GameWinForm.Model
         private int _damage = 1;
         private Timer _skillRechargeTimer = new Timer { Interval = 20 };
         private Timer _attackRechargeTimer = new Timer();
-        private float _dashSpeed = 100f;
+        private float _dashSpeed = 20f;
         private Timer _shieldTimer = new Timer();
+        private Timer _dashTimer = new Timer();
         private int _shieldDuration = 600;
 
         private const float _drag = 0.9f;
@@ -40,13 +42,14 @@ namespace GameWinForm.Model
         {
             Missiles = new List<Missile>();
             HP = 5;
-            Width = 90;
+            Width = 140;
             Height = 140;
             Position = new Vector2((_windowWidth - Width) / 2, (_windowHeight - Height) / 2);
             CurrentSkill = Skills.NoSkill;
             _attackIsReady = true;
             _attackRechargeTimer.Interval = _attackCoolDownTime;
             _attackRechargeTimer.Tick += RechargeAttack;
+            _dashTimer.Tick += UseDash;
             SelectedUpgrades = Enum.GetValues(typeof(Upgrades)).Cast<Upgrades>().ToDictionary(x => x, y => 0);
         }
 
@@ -54,7 +57,7 @@ namespace GameWinForm.Model
         {
             if (IsDeath()) return;
 
-            if (LastMoveDirection.Length() == 0)
+            if (LastMoveDirection.Length() == 0 && !IsDash)
                 Velocity *= _drag;
 
             if (Velocity.Length() < 0.1f)
@@ -130,7 +133,7 @@ namespace GameWinForm.Model
                     break;
 
                 case Upgrades.DashSpeed:
-                    _dashSpeed += 20;
+                    _dashSpeed += 2;
                     break;
 
                 case Upgrades.Damage:
@@ -145,11 +148,12 @@ namespace GameWinForm.Model
 
         private void Dash(Vector2 direction)
         {
-            if (SkillCoolDown >= _skillCoolDownTime)
+            if (SkillCoolDown >= _skillCoolDownTime && direction != Vector2.Zero)
             {
-                Position += new Vector2(direction.X, direction.Y).Normalize() * _dashSpeed;
-                SkillCoolDown = 0;
-                _skillRechargeTimer.Start();
+                IsDash = true;
+                Velocity = direction.Normalize() * _dashSpeed;
+                _dashTimer.Interval = (int)(16 * 200 / _dashSpeed);
+                _dashTimer.Start();
             }
         }
 
@@ -188,6 +192,15 @@ namespace GameWinForm.Model
             SkillCoolDown = 0;
             _skillRechargeTimer.Start();
             _shieldTimer.Stop();
+        }
+
+        private void UseDash(object sender, EventArgs e)
+        {
+            IsDash = false;
+            SkillCoolDown = 0;
+            _skillRechargeTimer.Start();
+            Velocity = Velocity.Normalize() * _acceleration;
+            _dashTimer.Stop();
         }
 
         private void RechargeAttack(object sender, EventArgs e)

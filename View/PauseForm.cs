@@ -65,7 +65,7 @@ namespace GameWinForm.View
             Controls.Add(button);
         }
 
-        private void ContinueButtonClick(object sender, EventArgs e) => _gameView.PauseGame(this);
+        private void ContinueButtonClick(object sender, EventArgs e) => _gameView.PauseGame();
 
         private void SettingsButtonClick(object sender, EventArgs e)
         { }

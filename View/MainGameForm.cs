@@ -21,13 +21,12 @@ namespace GameWinForm.View
             _model = new GameModel();
             _inputController = new InputController(_model);
             _mouseController = new MouseController(_model);
-            _gameView = new GameView(_model)
+            _gameView = new GameView(_model, this)
             {
                 Dock = DockStyle.Fill
             };
             _pauseForm = new PauseForm(_gameView, this);
             Controls.Add(_gameView);
-            Controls.Add(_pauseForm);
 
             _gameView.MouseDown += OnMouseDown;
             _gameView.MouseUp += OnMouseUp;
@@ -65,8 +64,6 @@ namespace GameWinForm.View
         protected override void OnKeyDown(KeyEventArgs e)
         {
             _inputController.HandleKeyDown(e.KeyCode);
-            if (e.KeyCode == Keys.Escape)
-                _gameView.PauseGame(_pauseForm);
             base.OnKeyDown(e);
         }
 

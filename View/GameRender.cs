@@ -18,18 +18,39 @@ namespace GameWinForm.View
     {
         private readonly GameModel _model;
 
-        private readonly Bitmap _playerSprite;
+        private readonly Bitmap _playerMoveRightSpriteSheet;
+        private readonly Bitmap _playerMoveLeftSpriteSheet;
+        private readonly Bitmap _playerStaySpriteSheet;
+
+        private SpriteAnimation _currentPlayerAnimation;
+        private SpriteAnimation _stayAnimation;
+        private SpriteAnimation _moveRightAnimation;
+        private SpriteAnimation _moveLeftAnimation;
+
         private readonly Bitmap _missileSprite;
         private readonly Bitmap _heartSprite;
+
+        private const int MoveAnimationSpeed = 12;
+        private const int StayAnimationSpeed = 12;
 
         private Color attackColor = Color.FromArgb(150, Color.Red);
 
         public GameRender(GameModel model)
         {
-            //_playerSprite = GetSprite("player2.png");
+            _playerStaySpriteSheet = GetSprite("SpriteSheetStay.png");
+            _playerMoveLeftSpriteSheet = GetSprite("MoveLeftSpriteSheet.png");
+            _playerMoveRightSpriteSheet = GetSprite("MoveRightSpriteSheet.png");
+
+            _playerStaySpriteSheet.MakeTransparent(Color.White);
+            _playerMoveLeftSpriteSheet.MakeTransparent(Color.White);
+            _playerMoveRightSpriteSheet.MakeTransparent(Color.White);
+
             _model = model;
-            _playerSprite = new Bitmap(model.Player.Width, model.Player.Height);
-            using (Graphics g = Graphics.FromImage(_playerSprite)) g.Clear(Color.Green);
+
+            _stayAnimation = new SpriteAnimation(_playerStaySpriteSheet, _model.Player.Width, _model.Player.Height, 9, 9, StayAnimationSpeed);
+            _moveRightAnimation = new SpriteAnimation(_playerMoveRightSpriteSheet, _model.Player.Width, _model.Player.Height, 5, 5, 6, 2);
+            _moveLeftAnimation = new SpriteAnimation(_playerMoveLeftSpriteSheet, _model.Player.Width, _model.Player.Height, 5, 5, 6, 2);
+
             _missileSprite = new Bitmap(15, 15);
             using (Graphics g = Graphics.FromImage(_missileSprite)) g.Clear(Color.Black);
             _heartSprite = new Bitmap(30, 30);
@@ -38,8 +59,10 @@ namespace GameWinForm.View
 
         private static Bitmap GetSprite(string fileName)
         {
-            var fullPath = Path.Combine(Directory.GetParent(Environment.CurrentDirectory).Parent.Parent.FullName,
-                "View", "Image", fileName);
+            var fullPath = Path.Combine(
+                Directory.GetParent(Environment.CurrentDirectory).Parent.Parent.FullName,
+                "View", "Image", fileName
+            );
             return new Bitmap(fullPath);
         }
 
@@ -56,11 +79,31 @@ namespace GameWinForm.View
             if (!_model.Player.IsDeath())
             {
                 var player = _model.Player;
-                graphics.DrawImage(_playerSprite,
-                    player.Position.X,
-                    player.Position.Y,
-                    _playerSprite.Width,
-                    _playerSprite.Height);
+                //graphics.DrawImage(_playerSprite,
+                //    player.Position.X,
+                //    player.Position.Y);
+                if (player.Velocity == Vector2.Zero)
+                {
+                    _currentPlayerAnimation = _stayAnimation;
+                    _moveRightAnimation.StartOver();
+                    _moveLeftAnimation.StartOver();
+                }
+                else
+                {
+                    if (player.Velocity.X > 0)
+                    {
+                        _currentPlayerAnimation = _moveRightAnimation;
+                        _moveLeftAnimation.StartOver();
+                    }
+                    if (player.Velocity.X < 0)
+                    { 
+                        _currentPlayerAnimation = _moveLeftAnimation;
+                        _moveRightAnimation.StartOver();
+                    }
+                }
+                    
+                _currentPlayerAnimation.Update();
+                _currentPlayerAnimation.Draw(graphics, (int)player.Position.X, (int)player.Position.Y);
                 DrawPlayerMissile(graphics);
 
                 for (int i = 0; i < player.HP; i++)
