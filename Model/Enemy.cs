@@ -36,26 +36,26 @@ namespace GameWinForm.Model
             Missiles = new List<Missile>();
         }
 
-        public Enemy(Player player, Vector2 position, Vector2[] trajectory, int width, int height, int hp)
+        public Enemy(Player player, Vector2 position, Vector2[] trajectory, int hp)
         {
             Missiles = new List<Missile>();
             HP = hp;
             Position = position;
-            Width = width;
-            Height = height;
+            Width = 75;
+            Height = 75;
             _player = player;
             Trajectory = trajectory;
             if (Trajectory.Length != 0)
                 _targetPosition = Trajectory[_indexTrajectory];
         }
 
-        public Enemy(Player player, Boss boss, Vector2 position, int width, int height, int hp)
+        public Enemy(Player player, Boss boss, Vector2 position, int hp)
         {
             Missiles = new List<Missile>();
             HP = hp;
             Position = position;
-            Width = width;
-            Height = height;
+            Width = 75;
+            Height = 75;
             _player = player;
             _boss = boss;
             _positionToBoss = Position - boss.Position;

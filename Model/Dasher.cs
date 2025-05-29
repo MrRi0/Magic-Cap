@@ -16,8 +16,8 @@ namespace GameWinForm.Model
         protected Timer _attackTimer = new Timer { Interval = 800 };
         protected Timer _trajectoryAttackTimer = new Timer { Interval = 2000 };
 
-        public Dasher(Player player, Vector2 position, Vector2[] trajectory, int width, int height, int hp) 
-            : base(player, position, trajectory, width, height, hp)
+        public Dasher(Player player, Vector2 position, Vector2[] trajectory, int hp) 
+            : base(player, position, trajectory, hp)
         {
             AttackTrajectory = Vector2.Zero;
             _speed = 15f;

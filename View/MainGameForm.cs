@@ -14,11 +14,11 @@ namespace GameWinForm.View
         private readonly MenuForm _menuForm;
         private readonly PauseForm _pauseForm;
 
-        public MainForm(MenuForm menuForm)
+        public MainForm(MenuForm menuForm, int levelNumber)
         {
             _menuForm = menuForm;
 
-            _model = new GameModel();
+            _model = new GameModel(levelNumber);
             _inputController = new InputController(_model);
             _mouseController = new MouseController(_model);
             _gameView = new GameView(_model, this)

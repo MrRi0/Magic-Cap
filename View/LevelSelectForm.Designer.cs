@@ -80,7 +80,7 @@ namespace GameWinForm.View
                         _windowHeight / 3 + _buttonSize.Height + _indentVertical);
                 }
                 Controls.Add(level);
-                level.Click += LevelButtonClick;
+                level.Click += LevelButtonNum1Click;
             }
         }
     }

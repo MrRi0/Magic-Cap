@@ -22,6 +22,8 @@ namespace GameWinForm.Model
         public Level Level { get; private set; }
         public bool IsPause { get; set; }
         public bool IsSelectUpgrade { get; set; }
+        public bool IsLevelComplete { get; private set; }
+        public bool IsLose { get; private set; }
         public Upgrades[] RandomUpgrades { get; private set; }
         public Skills[] RandomSkills { get; private set; }
 
@@ -29,29 +31,33 @@ namespace GameWinForm.Model
 
         private Stage _stage;
         private BossStage _bossFight;
-        //private Timer _stageTimer = new Timer { Interval = 1400 };
         private Timer _bossStageTimer = new Timer { Interval = 800 };
 
-        public GameModel()
+        public GameModel(int levelNumber)
         {
             Player = new Player();
-            Level = LevelCreator.CreateLevel(Player, 1);
+            Level = LevelCreator.CreateLevel(Player, levelNumber);
             _stage = Level.GetNextStage();
             Enemies = _stage.Enemies;
             BulletHellStage = _stage.Missiles;
-            //_stageTimer.Tick += GoNextStage;
             _bossStageTimer.Tick += GoNextStage;
-            IsPause = false;
         }
 
         public void Update()
         {
             Player.Update();
+
+            if (Player.IsDeath())
+            { 
+                IsLose = true;
+                return;
+            }
+
             if (Enemies == null) return;
             if (BulletHellStage == null) return;
             if (Boss != null)
-            { 
-                BossFightUpdate(); 
+            {
+                Boss.Update();
                 CheckBossCollisions(); 
             }
 
@@ -69,6 +75,11 @@ namespace GameWinForm.Model
 
             if (Enemies.Count == 0 && BulletHellStage.Count == 0 && _bossFight != null)
             {
+                if (Boss.IsDeath())
+                { 
+                    IsLevelComplete = true;
+                    return;
+                }
                 Boss.GetNextStage();
                 _bossStageTimer.Start();
             }
@@ -86,8 +97,8 @@ namespace GameWinForm.Model
             if (_bossFight != null)
             {
                 _stage = _bossFight.GetNextStage();
-                Enemies = _stage.Enemies.ToList();
-                BulletHellStage = _stage.Missiles.ToList();
+                Enemies = _stage.Enemies;
+                BulletHellStage = _stage.Missiles;
             }
             else
             { 
@@ -97,12 +108,16 @@ namespace GameWinForm.Model
             }
             if (_stage.IsEmpty())
             {
+                if (_bossFight != null)
+                {
+                    IsLevelComplete = true;
+                    return;
+                }
                 _bossFight = Level.GetBossStage();
                 Boss = _bossFight.Boss;
-                Enemies = _stage.Enemies.ToList();
-                BulletHellStage = _stage.Missiles.ToList();
+                Enemies = _stage.Enemies;
+                BulletHellStage = _stage.Missiles;
             }
-            //_stageTimer.Stop();
             _bossStageTimer.Stop();
         }
 
@@ -118,11 +133,6 @@ namespace GameWinForm.Model
             Player.SetSkill(skill);
             IsSelectUpgrade = false;
             GoNextStage(1, EventArgs.Empty);
-        }
-
-        private void BossFightUpdate()
-        {
-            Boss.Update();
         }
 
         private Upgrades[] GetRandomUpgrades()

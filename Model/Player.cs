@@ -13,7 +13,9 @@ namespace GameWinForm.Model
     public class Player : Entity
     {
         public Vector2 LastMoveDirection { get; set; }
+        public Vector2 LastDirectionView { get; private set; }
         public int SkillCoolDown { get; private set; }
+        public int SkillCoolDownTime { get; private set; }
         public bool IsShield { get; private set; }
         public bool IsDash { get; private set; }
         public Dictionary<Upgrades, int> SelectedUpgrades { get; private set; }
@@ -21,7 +23,6 @@ namespace GameWinForm.Model
 
         public event Action<Vector2> PositionChanged;
 
-        private int _skillCoolDownTime;
         private int _attackCoolDownTime = 250;
         private bool _attackIsReady;
         private int _damage = 1;
@@ -76,6 +77,8 @@ namespace GameWinForm.Model
         public void Move(Vector2 direction)
         {
             Velocity = new Vector2(direction.X, direction.Y).Normalize() * _acceleration;
+            if (direction.X != 0)
+                LastDirectionView = new Vector2(direction.X, 0);
         }
 
         public void UseSkill(Vector2 direction)
@@ -97,17 +100,17 @@ namespace GameWinForm.Model
             switch (skill)
             {
                 case Skills.Dash:
-                    _skillCoolDownTime = 2000;
+                    SkillCoolDownTime = 2000;
                     CurrentSkill = Skills.Dash;
                     break;
 
                 case Skills.Shield:
-                    _skillCoolDownTime = 2500;
+                    SkillCoolDownTime = 2600;
                     CurrentSkill = Skills.Shield;
                     _shieldTimer.Tick += UseShield;
                     break;
             }
-            SkillCoolDown = _skillCoolDownTime;
+            SkillCoolDown = SkillCoolDownTime;
             _skillRechargeTimer.Tick += RechargeSkill;
         }
 
@@ -141,14 +144,16 @@ namespace GameWinForm.Model
                     break;
 
                 case Upgrades.SkillCoolDown:
-                    _skillCoolDownTime -= _skillCoolDownTime / 10;
+                    SkillCoolDownTime -= SkillCoolDownTime / 10;
                     break;
             }
         }
 
         private void Dash(Vector2 direction)
         {
-            if (SkillCoolDown >= _skillCoolDownTime && direction != Vector2.Zero)
+            if (direction == Vector2.Zero)
+                direction = LastDirectionView;
+            if (SkillCoolDown >= SkillCoolDownTime)
             {
                 IsDash = true;
                 Velocity = direction.Normalize() * _dashSpeed;
@@ -159,7 +164,7 @@ namespace GameWinForm.Model
 
         private void Shield()
         {
-            if (SkillCoolDown >= _skillCoolDownTime)
+            if (SkillCoolDown >= SkillCoolDownTime)
             {
                 IsInvulnerability = true;
                 IsShield = true;
@@ -180,8 +185,8 @@ namespace GameWinForm.Model
 
         private void RechargeSkill(object sender, EventArgs e)
         {
-            SkillCoolDown += _skillCoolDownTime / _skillRechargeTimer.Interval;
-            if (SkillCoolDown >= _skillCoolDownTime)
+            SkillCoolDown += _skillRechargeTimer.Interval;
+            if (SkillCoolDown >= SkillCoolDownTime)
                 _skillRechargeTimer.Stop();
         }
 

@@ -11,7 +11,7 @@ namespace GameWinForm.Core
         public static async Task SwitchForms(this Form currentForm, Form newForm)
         {
             newForm.Show();
-            await Task.Delay(30);
+            await Task.Delay(50);
             currentForm.Hide();
         }
     }

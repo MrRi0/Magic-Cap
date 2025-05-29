@@ -24,9 +24,9 @@ namespace GameWinForm.View
             InitializeComponent();
         }
 
-        private void LevelButtonClick(object sender, EventArgs e)
+        private void LevelButtonNum1Click(object sender, EventArgs e)
         {
-            _mainForm = new MainForm(_menu);
+            _mainForm = new MainForm(_menu, 1);
             this.SwitchForms(_mainForm);
         }
 

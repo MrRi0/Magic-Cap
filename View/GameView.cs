@@ -12,11 +12,12 @@ namespace GameWinForm.View
 {
     public class GameView : UserControl
     {
-        //public bool IsPause { get; private set; }
         private bool IsPause;
         private bool IsSelectSkill;
-        private readonly GameModel _model;
         private SelectSkillForm _uprgadeSelectForm;
+        private WinnerForm _winnerForm;
+        private LoseForm _loseForm;
+        private readonly GameModel _model;
         private readonly PauseForm _pauseForm;
         private readonly System.Windows.Forms.Timer _gameLoop;
 
@@ -26,10 +27,20 @@ namespace GameWinForm.View
             _model = model;
             render = new GameRender(_model);
             DoubleBuffered = true;
+
             IsPause = false;
             _pauseForm = new PauseForm(this, mainForm);
             Controls.Add(_pauseForm);
             _pauseForm.Hide();
+
+            _winnerForm = new WinnerForm(mainForm);
+            Controls.Add(_winnerForm);
+            _winnerForm.Hide();
+
+            _loseForm = new LoseForm(mainForm);
+            Controls.Add(_loseForm);
+            _loseForm.Hide();
+
             _gameLoop = new System.Windows.Forms.Timer { Interval = 16 };
             _gameLoop.Tick += GameLoop_Tick;
             _gameLoop.Start();
@@ -83,6 +94,18 @@ namespace GameWinForm.View
             {
                 PauseGame();
             }
+            if (_model.IsLevelComplete)
+            {
+                _gameLoop.Stop();
+                _winnerForm.BringToFront();
+                _winnerForm.Show();
+            }
+            if (_model.IsLose)
+            {
+                _gameLoop.Stop();
+                _loseForm.BringToFront();
+                _loseForm.Show();
+            }
             Invalidate();
         }
 
@@ -93,8 +116,6 @@ namespace GameWinForm.View
             e.Graphics.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.None;
             e.Graphics.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.NearestNeighbor;
             e.Graphics.PixelOffsetMode = System.Drawing.Drawing2D.PixelOffsetMode.Half;
-
-            //var render = new GameRender(_model);
 
             render.Render(e.Graphics);
         }

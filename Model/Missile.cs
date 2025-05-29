@@ -17,7 +17,7 @@ namespace GameWinForm.Model
         public int Damage { get; private set; }
 
         private float _speed = 25f;
-        private Timer _showTrajectory = new Timer { Interval = 2000 };
+        private Timer _showTrajectory = new Timer { Interval = 1500 };
 
         public event Action<Vector2> PositionChanged;
 

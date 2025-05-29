@@ -15,14 +15,14 @@ namespace GameWinForm.Model
         protected Timer _attackTimer = new Timer { Interval = 700 };
         protected Timer _trajectoryAttackTimer = new Timer { Interval = 2000 };
 
-        public Shooter(Player player, Vector2 position, Vector2[] trajectory, int width, int height, int hp)
-            : base(player, position, trajectory, width, height, hp)
+        public Shooter(Player player, Vector2 position, Vector2[] trajectory, int hp)
+            : base(player, position, trajectory, hp)
         {
             AttackTrajectory = Vector2.Zero;
         }
 
-        public Shooter(Player player, Boss boss, Vector2 position, int width, int height, int hp)
-            : base(player, boss, position, width, height, hp)
+        public Shooter(Player player, Boss boss, Vector2 position, int hp)
+            : base(player, boss, position, hp)
         {
             AttackTrajectory = Vector2.Zero;
         }

@@ -20,39 +20,50 @@ namespace GameWinForm.View
 
         private readonly Bitmap _playerMoveRightSpriteSheet;
         private readonly Bitmap _playerMoveLeftSpriteSheet;
-        private readonly Bitmap _playerStaySpriteSheet;
+        private readonly Bitmap _playerStayLeftSpriteSheet;
+        private readonly Bitmap _playerStayRightSpriteSheet;
+        private readonly Bitmap _shooterSpriteSheet;
+        private readonly Bitmap _dasherSpriteSheet;
+        private readonly Bitmap _bossSprite;
 
         private SpriteAnimation _currentPlayerAnimation;
-        private SpriteAnimation _stayAnimation;
+        private SpriteAnimation _stayLeftAnimation;
+        private SpriteAnimation _stayRightAnimation;
         private SpriteAnimation _moveRightAnimation;
         private SpriteAnimation _moveLeftAnimation;
+        private SpriteAnimation _shooterAnimation;
+        private SpriteAnimation _dasherAnimation;
 
-        private readonly Bitmap _missileSprite;
+        private readonly Bitmap _playerMissileSprite;
+        private readonly Bitmap _enemyMissileSprite;
         private readonly Bitmap _heartSprite;
 
-        private const int MoveAnimationSpeed = 12;
+        private const int MoveAnimationSpeed = 6;
         private const int StayAnimationSpeed = 12;
 
         private Color attackColor = Color.FromArgb(150, Color.Red);
 
         public GameRender(GameModel model)
         {
-            _playerStaySpriteSheet = GetSprite("SpriteSheetStay.png");
+            _playerStayLeftSpriteSheet = GetSprite("SpriteSheetStayLeft.png");
+            _playerStayRightSpriteSheet = GetSprite("SpriteSheetStayRight.png");
             _playerMoveLeftSpriteSheet = GetSprite("MoveLeftSpriteSheet.png");
             _playerMoveRightSpriteSheet = GetSprite("MoveRightSpriteSheet.png");
-
-            _playerStaySpriteSheet.MakeTransparent(Color.White);
-            _playerMoveLeftSpriteSheet.MakeTransparent(Color.White);
-            _playerMoveRightSpriteSheet.MakeTransparent(Color.White);
+            _playerMissileSprite = GetSprite("playerMissle.png");
+            _enemyMissileSprite = GetSprite("enemyMissile.png");
+            _shooterSpriteSheet = GetSprite("shooterSheet.png");
+            _dasherSpriteSheet = GetSprite("dasherSheet.png");
+            _bossSprite = GetSprite("bossSprite.png");
 
             _model = model;
 
-            _stayAnimation = new SpriteAnimation(_playerStaySpriteSheet, _model.Player.Width, _model.Player.Height, 9, 9, StayAnimationSpeed);
-            _moveRightAnimation = new SpriteAnimation(_playerMoveRightSpriteSheet, _model.Player.Width, _model.Player.Height, 5, 5, 6, 2);
-            _moveLeftAnimation = new SpriteAnimation(_playerMoveLeftSpriteSheet, _model.Player.Width, _model.Player.Height, 5, 5, 6, 2);
+            _stayLeftAnimation = new SpriteAnimation(_playerStayLeftSpriteSheet, _model.Player.Width, _model.Player.Height, 9, 9, StayAnimationSpeed);
+            _stayRightAnimation = new SpriteAnimation(_playerStayRightSpriteSheet, _model.Player.Width, _model.Player.Height, 9, 9, StayAnimationSpeed);
+            _moveRightAnimation = new SpriteAnimation(_playerMoveRightSpriteSheet, _model.Player.Width, _model.Player.Height, 5, 5, MoveAnimationSpeed, 2);
+            _moveLeftAnimation = new SpriteAnimation(_playerMoveLeftSpriteSheet, _model.Player.Width, _model.Player.Height, 5, 5, MoveAnimationSpeed, 2);
+            _shooterAnimation = new SpriteAnimation(_shooterSpriteSheet, 75, 75, 6, 6, 8);
+            _dasherAnimation = new SpriteAnimation(_dasherSpriteSheet, 75, 75, 6, 6, 8);
 
-            _missileSprite = new Bitmap(15, 15);
-            using (Graphics g = Graphics.FromImage(_missileSprite)) g.Clear(Color.Black);
             _heartSprite = new Bitmap(30, 30);
             using (Graphics g = Graphics.FromImage(_heartSprite)) g.Clear(Color.Red);
         }
@@ -63,7 +74,9 @@ namespace GameWinForm.View
                 Directory.GetParent(Environment.CurrentDirectory).Parent.Parent.FullName,
                 "View", "Image", fileName
             );
-            return new Bitmap(fullPath);
+            var result = new Bitmap(fullPath);
+            result.MakeTransparent(Color.White);
+            return result;
         }
 
         public void Render(Graphics graphics)
@@ -79,12 +92,12 @@ namespace GameWinForm.View
             if (!_model.Player.IsDeath())
             {
                 var player = _model.Player;
-                //graphics.DrawImage(_playerSprite,
-                //    player.Position.X,
-                //    player.Position.Y);
-                if (player.Velocity == Vector2.Zero)
+                if (player.Velocity == Vector2.Zero || player.LastMoveDirection == Vector2.Zero)
                 {
-                    _currentPlayerAnimation = _stayAnimation;
+                    if (player.LastDirectionView.X > 0)
+                        _currentPlayerAnimation = _stayRightAnimation;
+                    else
+                        _currentPlayerAnimation = _stayLeftAnimation;
                     _moveRightAnimation.StartOver();
                     _moveLeftAnimation.StartOver();
                 }
@@ -96,30 +109,35 @@ namespace GameWinForm.View
                         _moveLeftAnimation.StartOver();
                     }
                     if (player.Velocity.X < 0)
-                    { 
+                    {
                         _currentPlayerAnimation = _moveLeftAnimation;
                         _moveRightAnimation.StartOver();
                     }
                 }
-                    
+
                 _currentPlayerAnimation.Update();
                 _currentPlayerAnimation.Draw(graphics, (int)player.Position.X, (int)player.Position.Y);
                 DrawPlayerMissile(graphics);
-
-                for (int i = 0; i < player.HP; i++)
-                    graphics.DrawImage(_heartSprite, new Point(20 + _heartSprite.Width * 3 / 2 * i, 20));
-
-                graphics.DrawRectangle(new Pen(Color.Red), 20, 20 + _heartSprite.Height + 10, 200, 31);
-                graphics.DrawLine(new Pen(Color.Cyan, 30), 21, 20 + _heartSprite.Height + 10 + 15 + 1,
-                    20 + player.SkillCoolDown / 10, 20 + _heartSprite.Height + 10 + 15 + 1);
-
-                if (player.IsShield)
-                    graphics.DrawEllipse(new Pen(Color.Cyan), 
-                        player.GetCenterPosition().X - player.Height * 3 / 4, 
-                        player.GetCenterPosition().Y - player.Height * 3 / 4, 
-                        player.Height * 3 / 2, 
-                        player.Height * 3 / 2);
+                DrawPlayerUI(graphics, player);
             }
+        }
+
+        private void DrawPlayerUI(Graphics graphics, Player player)
+        {
+            for (int i = 0; i < player.HP; i++)
+                graphics.DrawImage(_heartSprite, new Point(20 + _heartSprite.Width * 3 / 2 * i, 20));
+
+            graphics.DrawRectangle(new Pen(Color.Red), 20, 20 + _heartSprite.Height + 10, 201, 31);
+            if (player.CurrentSkill != Skills.NoSkill)
+                graphics.DrawLine(new Pen(Color.Cyan, 30), 21, 20 + _heartSprite.Height + 10 + 15,
+                    20 + player.SkillCoolDown / (player.SkillCoolDownTime / 200), 20 + _heartSprite.Height + 10 + 15);
+
+            if (player.IsShield)
+                graphics.DrawEllipse(new Pen(Color.Cyan, 3),
+                    player.GetCenterPosition().X - player.Height * 3 / 4,
+                    player.GetCenterPosition().Y - player.Height * 3 / 4,
+                    player.Height * 3 / 2,
+                    player.Height * 3 / 2);
         }
 
         private void DrawBoss(Graphics graphics)
@@ -127,7 +145,7 @@ namespace GameWinForm.View
             var boss = _model.Boss;
             if (boss != null && !_model.Boss.IsDeath())
             {
-                graphics.DrawRectangle(new Pen(Color.Red), boss.Position.X, boss.Position.Y, boss.Width, boss.Height);
+                graphics.DrawImage(_bossSprite, boss.Position.X, boss.Position.Y);
                 if (boss.AttackTrajectory != Vector2.Zero)
                 {
                     var normalizedTrajectory = boss.AttackTrajectory.Normalize();
@@ -145,12 +163,12 @@ namespace GameWinForm.View
         {
             foreach (var missile in _model.Player.Missiles)
             {
-                graphics.DrawImage(_missileSprite,
+                graphics.DrawImage(_playerMissileSprite,
                     missile.Position.X,
                     missile.Position.Y,
-                    _missileSprite.Width,
-                    _missileSprite.Height);
-            }
+                    _playerMissileSprite.Width,
+                    _playerMissileSprite.Height);
+            }   
         }
 
         private void DrawEnemies(Graphics graphics)
@@ -158,42 +176,57 @@ namespace GameWinForm.View
             if (_model.Enemies == null) return;
             foreach (var enemy in _model.Enemies)
             {
-                graphics.DrawRectangle(new Pen(Color.Red), enemy.Position.X, enemy.Position.Y, enemy.Width, enemy.Height);
-                if (enemy is Shooter && ((Shooter)enemy).AttackTrajectory != Vector2.Zero)
+                if (enemy is Shooter)
                 {
                     var shooter = (Shooter)enemy;
-                    graphics.DrawLine(new Pen(attackColor),
-                        shooter.GetCenterPosition().X, 
-                        shooter.GetCenterPosition().Y, 
-                        shooter.AttackTrajectory.X, 
-                        shooter.AttackTrajectory.Y);
+                    _shooterAnimation.Update();
+                    _shooterAnimation.Draw(graphics, (int)enemy.Position.X, (int)enemy.Position.Y);
+                    if (((Shooter)enemy).AttackTrajectory != Vector2.Zero)
+                    {
+                        graphics.DrawLine(new Pen(attackColor),
+                            shooter.GetCenterPosition().X,
+                            shooter.GetCenterPosition().Y,
+                            shooter.AttackTrajectory.X,
+                            shooter.AttackTrajectory.Y);
+                    }
                 }
 
-                if (enemy is Dasher && ((Dasher)enemy).AttackTrajectory != Vector2.Zero)
+                else if (enemy is Dasher)
                 {
                     var dasher = (Dasher)enemy;
-                    var normalizedTrajectory = dasher.AttackTrajectory.Normalize();
-                    var widthLine = normalizedTrajectory.X * dasher.Height + normalizedTrajectory.Y * dasher.Width;
-                    graphics.DrawLine(new Pen(attackColor, widthLine),
-                        dasher.GetCenterPosition().X,
-                        dasher.GetCenterPosition().Y,
-                        dasher.AttackTrajectory.X,
-                        dasher.AttackTrajectory.Y);
+                    _dasherAnimation.Update();
+                    _dasherAnimation.Draw(graphics, (int)enemy.Position.X, (int)enemy.Position.Y);
+                    if (((Dasher)enemy).AttackTrajectory != Vector2.Zero)
+                    {
+                        var normalizedTrajectory = dasher.AttackTrajectory.Normalize();
+                        var widthLine = normalizedTrajectory.X * dasher.Height + normalizedTrajectory.Y * dasher.Width;
+                        graphics.DrawLine(new Pen(attackColor, widthLine),
+                            dasher.GetCenterPosition().X,
+                            dasher.GetCenterPosition().Y,
+                            dasher.AttackTrajectory.X,
+                            dasher.AttackTrajectory.Y);
+                    }
                 }
 
-                foreach (var missile in enemy.Missiles)
-                    DrawEnemyMissile(missile, graphics);
+                else
+                {
+                    _shooterAnimation.Update();
+                    _shooterAnimation.Draw(graphics, (int)enemy.Position.X, (int)enemy.Position.Y);
+                }
+
+                    foreach (var missile in enemy.Missiles)
+                        DrawEnemyMissile(missile, graphics);
 
             }
         }
 
         private void DrawEnemyMissile(Missile missile, Graphics graphics)
         {
-            graphics.DrawImage(_missileSprite,
+            graphics.DrawImage(_enemyMissileSprite,
                     missile.Position.X,
                     missile.Position.Y,
-                    _missileSprite.Width,
-                    _missileSprite.Height);
+                    _enemyMissileSprite.Width,
+                    _enemyMissileSprite.Height);
         }
 
         private void DrawBulletHellStage(Graphics graphics)
@@ -206,11 +239,11 @@ namespace GameWinForm.View
                         missile.GetCenterPosition().Y,
                         missile.AttackTrajectory.X,
                         missile.AttackTrajectory.Y);
-                graphics.DrawImage(_missileSprite,
+                graphics.DrawImage(_enemyMissileSprite,
                     missile.Position.X,
                     missile.Position.Y,
-                    _missileSprite.Width,
-                    _missileSprite.Height);
+                    _enemyMissileSprite.Width,
+                    _enemyMissileSprite.Height);
             }
         }
     }
