@@ -130,11 +130,11 @@ namespace GameWinForm.View
 
             graphics.DrawRectangle(new Pen(Color.Red), 20, 20 + _heartSprite.Height + 10, 201, 31);
             if (player.CurrentSkill != Skills.NoSkill)
-                graphics.DrawLine(new Pen(Color.Cyan, 30), 21, 20 + _heartSprite.Height + 10 + 15,
+                graphics.DrawLine(new Pen(Color.Purple, 30), 21, 20 + _heartSprite.Height + 10 + 15,
                     20 + player.SkillCoolDown / (player.SkillCoolDownTime / 200), 20 + _heartSprite.Height + 10 + 15);
 
             if (player.IsShield)
-                graphics.DrawEllipse(new Pen(Color.Cyan, 3),
+                graphics.DrawEllipse(new Pen(Color.Purple, 3),
                     player.GetCenterPosition().X - player.Height * 3 / 4,
                     player.GetCenterPosition().Y - player.Height * 3 / 4,
                     player.Height * 3 / 2,

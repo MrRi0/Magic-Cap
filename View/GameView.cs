@@ -47,12 +47,8 @@ namespace GameWinForm.View
             _gameLoop.Tick += GameLoop_Tick;
             _gameLoop.Start();
 
-            //var original = GetSprite("mainBackground.png");
-            //_optimizedBackground = new Bitmap(original, this.ClientSize); // Масштабирование 1 раз
-            //original.Dispose();
-
             var bgImage = GetSprite("mainBackground.png");
-            _backgroundBrush = new TextureBrush(bgImage); // Создаем кисть
+            _backgroundBrush = new TextureBrush(bgImage);
             bgImage.Dispose();
 
             SetStyle(ControlStyles.OptimizedDoubleBuffer, true);

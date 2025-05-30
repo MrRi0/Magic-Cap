@@ -11,6 +11,5 @@ namespace GameWinForm.Model
         NoSkill,
         Dash,
         Shield,
-        Teleportation
     }
 }
